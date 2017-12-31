@@ -1,0 +1,205 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{16F46426-A6F0-4819-8D30-4C79E7FE38B2}</ProjectGuid>
+    <RootNamespace>libdai</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>../include;C:\boost_1_50_0;C:\boost_1_50_0\boost\tr1;C:\mpir-2.5.1\lib\Win32\Debug;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\mpir-2.5.1\lib\Win32\Debug;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>../include;C:\boost_1_50_0;C:\boost_1_50_0\boost\tr1;C:\mpir-2.5.1\lib\x64\Debug;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\mpir-2.5.1\lib\x64\Debug;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>../include;C:\boost_1_50_0;C:\boost_1_50_0\boost\tr1;C:\mpir-2.5.1\lib\Win32\Release;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\mpir-2.5.1\lib\Win32\Release;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>../include;C:\boost_1_50_0;C:\boost_1_50_0\boost\tr1;C:\mpir-2.5.1\lib\x64\Release;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\mpir-2.5.1\lib\x64\Release;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;WINDOWS;DAI_WITH_DECMAP;DAI_WITH_CBP;DAI_WITH_GIBBS;DAI_WITH_MR;DAI_WITH_JTREE;DAI_WITH_TREEEP;DAI_WITH_LC;DAI_WITH_HAK;DAI_WITH_MF;DAI_WITH_TRWBP;DAI_WITH_FBP;DAI_WITH_BP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;WINDOWS;DAI_WITH_DECMAP;DAI_WITH_CBP;DAI_WITH_GIBBS;DAI_WITH_MR;DAI_WITH_JTREE;DAI_WITH_TREEEP;DAI_WITH_LC;DAI_WITH_HAK;DAI_WITH_MF;DAI_WITH_TRWBP;DAI_WITH_FBP;DAI_WITH_BP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;WINDOWS;DAI_WITH_DECMAP;DAI_WITH_CBP;DAI_WITH_GIBBS;DAI_WITH_MR;DAI_WITH_JTREE;DAI_WITH_TREEEP;DAI_WITH_LC;DAI_WITH_HAK;DAI_WITH_MF;DAI_WITH_TRWBP;DAI_WITH_FBP;DAI_WITH_BP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;WINDOWS;DAI_WITH_DECMAP;DAI_WITH_CBP;DAI_WITH_GIBBS;DAI_WITH_MR;DAI_WITH_JTREE;DAI_WITH_TREEEP;DAI_WITH_LC;DAI_WITH_HAK;DAI_WITH_MF;DAI_WITH_TRWBP;DAI_WITH_FBP;DAI_WITH_BP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\dai\alldai.h" />
+    <ClInclude Include="..\include\dai\bbp.h" />
+    <ClInclude Include="..\include\dai\bipgraph.h" />
+    <ClInclude Include="..\include\dai\bp.h" />
+    <ClInclude Include="..\include\dai\bp_dual.h" />
+    <ClInclude Include="..\include\dai\cbp.h" />
+    <ClInclude Include="..\include\dai\clustergraph.h" />
+    <ClInclude Include="..\include\dai\dag.h" />
+    <ClInclude Include="..\include\dai\daialg.h" />
+    <ClInclude Include="..\include\dai\decmap.h" />
+    <ClInclude Include="..\include\dai\doc.h" />
+    <ClInclude Include="..\include\dai\emalg.h" />
+    <ClInclude Include="..\include\dai\enum.h" />
+    <ClInclude Include="..\include\dai\evidence.h" />
+    <ClInclude Include="..\include\dai\exactinf.h" />
+    <ClInclude Include="..\include\dai\exceptions.h" />
+    <ClInclude Include="..\include\dai\factor.h" />
+    <ClInclude Include="..\include\dai\factorgraph.h" />
+    <ClInclude Include="..\include\dai\fbp.h" />
+    <ClInclude Include="..\include\dai\gibbs.h" />
+    <ClInclude Include="..\include\dai\graph.h" />
+    <ClInclude Include="..\include\dai\hak.h" />
+    <ClInclude Include="..\include\dai\index.h" />
+    <ClInclude Include="..\include\dai\io.h" />
+    <ClInclude Include="..\include\dai\jtree.h" />
+    <ClInclude Include="..\include\dai\lc.h" />
+    <ClInclude Include="..\include\dai\mf.h" />
+    <ClInclude Include="..\include\dai\mr.h" />
+    <ClInclude Include="..\include\dai\prob.h" />
+    <ClInclude Include="..\include\dai\properties.h" />
+    <ClInclude Include="..\include\dai\regiongraph.h" />
+    <ClInclude Include="..\include\dai\smallset.h" />
+    <ClInclude Include="..\include\dai\treeep.h" />
+    <ClInclude Include="..\include\dai\trwbp.h" />
+    <ClInclude Include="..\include\dai\util.h" />
+    <ClInclude Include="..\include\dai\var.h" />
+    <ClInclude Include="..\include\dai\varset.h" />
+    <ClInclude Include="..\include\dai\weightedgraph.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\alldai.cpp" />
+    <ClCompile Include="..\src\bbp.cpp" />
+    <ClCompile Include="..\src\bipgraph.cpp" />
+    <ClCompile Include="..\src\bp.cpp" />
+    <ClCompile Include="..\src\bp_dual.cpp" />
+    <ClCompile Include="..\src\cbp.cpp" />
+    <ClCompile Include="..\src\clustergraph.cpp" />
+    <ClCompile Include="..\src\dag.cpp" />
+    <ClCompile Include="..\src\daialg.cpp" />
+    <ClCompile Include="..\src\decmap.cpp" />
+    <ClCompile Include="..\src\emalg.cpp" />
+    <ClCompile Include="..\src\evidence.cpp" />
+    <ClCompile Include="..\src\exactinf.cpp" />
+    <ClCompile Include="..\src\exceptions.cpp" />
+    <ClCompile Include="..\src\factor.cpp" />
+    <ClCompile Include="..\src\factorgraph.cpp" />
+    <ClCompile Include="..\src\fbp.cpp" />
+    <ClCompile Include="..\src\gibbs.cpp" />
+    <ClCompile Include="..\src\graph.cpp" />
+    <ClCompile Include="..\src\hak.cpp" />
+    <ClCompile Include="..\src\io.cpp" />
+    <ClCompile Include="..\src\jtree.cpp" />
+    <ClCompile Include="..\src\lc.cpp" />
+    <ClCompile Include="..\src\mf.cpp" />
+    <ClCompile Include="..\src\mr.cpp" />
+    <ClCompile Include="..\src\properties.cpp" />
+    <ClCompile Include="..\src\regiongraph.cpp" />
+    <ClCompile Include="..\src\treeep.cpp" />
+    <ClCompile Include="..\src\trwbp.cpp" />
+    <ClCompile Include="..\src\util.cpp" />
+    <ClCompile Include="..\src\varset.cpp" />
+    <ClCompile Include="..\src\weightedgraph.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
