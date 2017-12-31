@@ -5,3 +5,6 @@ tests/uai/MAR_prob/*.dfg
 __pycache__/
 .idea/
 .DS_Store
+dist/
+*.egg-info/
+build/

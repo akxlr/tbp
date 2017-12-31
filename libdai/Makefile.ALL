@@ -19,7 +19,13 @@
 # COMPILATION AND BUILD FLAGS
 
 # Build with debug info? (slower but safer)
-DEBUG=true
+DEBUG=false
+
+# Build tests? (disabled because tests are not included with TBP due to filesize)
+WITH_TESTS=
+
+# Build examples? (disabled because examples are not included with TBP due to filesize)
+WITH_EXAMPLES=
 
 # Build doxygen documentation? (doxygen and TeX need to be installed)
 WITH_DOC=

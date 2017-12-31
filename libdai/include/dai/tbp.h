@@ -1,4 +1,6 @@
 #include <iostream>
+#include <cfloat>
+#include <sstream>
 #include <dai/alldai.h>
 #include <Eigen/Dense>
 

@@ -13,14 +13,17 @@ from typing import List
 import numpy as np
 from numpy.linalg import LinAlgError
 
-BASE_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../')
-TBP_BINARY = os.path.join(BASE_DIR, 'libdai/utils/dfgmarg')
+BASE_DIR = os.path.dirname(os.path.realpath(__file__))
+TBP_BINARY = os.path.join(BASE_DIR, 'dfgmarg')
 HOMEPAGE = "https://github.com/akxlr/tbp"
 
 # How many rank-1 terms to decompose each initial potential function into
 DEFAULT_COMPONENTS = 4
 # Default sample size K for sampling step of TBP
 DEFAULT_SAMPLE_SIZE = 10000
+# Limits for truncating values when writing .dfg files (one order of magnitude inside C++ DBL_MIN, DBL_MAX)
+DBL_MIN = 2.22507e-307
+DBL_MAX = 1.79769e+307
 
 verbosity = 1
 
@@ -54,6 +57,18 @@ def import_tensorly():
 def status(msg, level):
     if verbosity >= level:
         print(msg)
+
+
+def safedouble(number):
+    """
+    Return number as a string, making sure it's within C++ bounds [DBL_MIN, DBL_MAX]. This is necessary to avoid
+    underflow when reading .dfg files in tbp.cpp.
+    """
+    if number < DBL_MIN:
+        number = DBL_MIN
+    if number > DBL_MAX:
+        number = DBL_MAX
+    return str(number)
 
 
 class SuppressOutput:
@@ -502,7 +517,7 @@ class DecomposedFactor(FactorBase):
         """
         res = '\n'.join([
             str(self.n_terms),
-            ' '.join(str(x) for x in self.weights),
+            ' '.join(safedouble(x) for x in self.weights),
             str(self.n_vars),
             ' '.join(str(x) for x in self.vars),
             ' '.join(str(x) for x in self.cardinalities),
@@ -510,7 +525,7 @@ class DecomposedFactor(FactorBase):
         for m in self.matrices:
             # 'F' = column-major order
             table_flat = m.flatten(order='F')
-            nonzero = [(i, table_flat[i]) for i in range(len(table_flat)) if table_flat[i]]
+            nonzero = [(i, safedouble(table_flat[i])) for i in range(len(table_flat)) if table_flat[i]]
             res += str(len(nonzero)) + '\n'
             for x in nonzero:
                 res += '{} {}\n'.format(*x)

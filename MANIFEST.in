@@ -1,0 +1,3 @@
+recursive-include libdai *
+recursive-exclude libdai/tests *
+recursive-exclude libdai/examples *

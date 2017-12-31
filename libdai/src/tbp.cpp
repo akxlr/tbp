@@ -150,6 +150,9 @@ namespace dai {
 
             for (size_t mi = 0; mi < nr_vars; mi++) {
 
+                if (verbose >= 2)
+                    cerr << "  Reading matrix " << mi << endl;
+
                 // Check cardinality of this variable is consistent with past occurrences
                 map<int, size_t>::iterator vdi = vardims.find(labels[mi]);
                 if (vdi != vardims.end()) {
@@ -168,17 +171,24 @@ namespace dai {
                     getline(is, line);
                 is >> nr_nonzeros;
                 if (verbose >= 2)
-                    cerr << "  nonzeroes: " << nr_nonzeros << endl;
+                    cerr << "     nonzeroes: " << nr_nonzeros << endl;
 
                 for (size_t k = 0; k < nr_nonzeros; k++) {
                     size_t li;
                     double val;
                     while ((is.peek()) == '#')
                         getline(is, line);
-                    is >> li;
+                    if (!(is >> li)) {
+                        DAI_THROWE(INVALID_FACTORGRAPH_FILE,"Matrix index could not be parsed as int");
+                    }
                     while ((is.peek()) == '#')
                         getline(is, line);
-                    is >> val;
+                    if (!(is >> val)) {
+                        std::stringstream s;
+                        s << "Matrix value could not be cast as double - check that matrix values in .dfg file are within "
+                        "C++ double limits [" << DBL_MIN << ", " << DBL_MAX << "]";
+                        DAI_THROWE(INVALID_FACTORGRAPH_FILE, s.str());
+                    }
 
                     // The matrix we are trying to recover has dimensions (<variable cardinality> * <n_terms>)
                     // indexed in column-major order - i.e. we first read all the values for the first term, then the
@@ -186,7 +196,11 @@ namespace dai {
 
                     size_t col = li / dims[mi];
                     size_t row = li % dims[mi];
+                    if (verbose >= 2)
+                        cerr << "     index: " << li << " (" << row << ", " << col << ") value: " << val << endl;
                     mat(row, col) = val;
+
+
                 }
 
                 matrices.push_back(mat);
