@@ -15,6 +15,7 @@ matrix:
 install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; brew install python3; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libboost-all-dev; fi
+  - pip install pytest
   - pip install .
 
 script:
