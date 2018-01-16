@@ -379,7 +379,7 @@ class Graph:
 
             # All factors are now just functions of var, multiply them together and normalise
             marg_unnormalised = functools.reduce(mul, temp_g.factors).table
-            all_marg.append(marg_unnormalised / np.sum(marg_unnormalised))
+            all_marg.append((marg_unnormalised / np.sum(marg_unnormalised)).tolist())
 
         return all_marg
 
@@ -468,13 +468,13 @@ class DecomposedGraph(Graph):
         with open(filename, 'w') as f:
             f.write(str(self))
 
-    def tbp_marg(self, K=DEFAULT_SAMPLE_SIZE):
+    def tbp_marg(self, k=DEFAULT_SAMPLE_SIZE):
         """
         Call libdai/utils/dfgmarg binary via pipe to get approximate marginals.
-        :param K: TBP sample size
+        :param k: TBP sample size
         :return: Marginals as list of lists.
         """
-        p = subprocess.run([TBP_BINARY, str(K)], stdout=subprocess.PIPE,
+        p = subprocess.run([TBP_BINARY, str(k)], stdout=subprocess.PIPE,
                            input=str(self), encoding='ascii')
         assert p.returncode == 0
 
@@ -766,7 +766,7 @@ def ising_g(N, unary_min, unary_max, pairwise_min, pairwise_max):
     """
     NxN Ising model with random potentials uniformly chosen within the given limits.
     :return: Tuple (g, dg) containing the ising model as a Graph and DecomposedGraph instance respectively. The
-    tensor decomposition used is described in Wrigley et al (2017), supplementary material.
+    tensor decomposition used is described in Wrigley, Lee and Ye (2017), supplementary material.
     """
     g = []
     dg = []
@@ -804,7 +804,7 @@ def ising_g(N, unary_min, unary_max, pairwise_min, pairwise_max):
     return Graph(g), DecomposedGraph(dg)
 
 
-def L1_error(marg_1, marg_2, binary=False):
+def l1_error(marg_1, marg_2, binary=False):
     """
     Mean L1 marginal error.
     :param marg_1: List of lists containing marginals
@@ -843,16 +843,16 @@ def format_mar(marg):
     return ' '.join(str(x) for x in fields)
 
 
-def run_tests(tests, Ks, binary_err=False):
+def run_tests(tests, ks, binary_err=False):
 
     for i, (name, g, dg, true_marg) in enumerate(tests):
         print("Running test '{}' ({} of {})".format(name, i + 1, len(tests)))
         components = g.show_stats()
         print("Results:")
-        for K in Ks:
-            marg_est = dg.tbp_marg(K)
-            err = L1_error(marg_est, true_marg, binary_err)
-            print("  (K={}) Mean L1 error: {}".format(K, err))
+        for k in ks:
+            marg_est = dg.tbp_marg(k)
+            err = l1_error(marg_est, true_marg, binary_err)
+            print("  (k={}) Mean L1 error: {}".format(k, err))
         print("")
 
 

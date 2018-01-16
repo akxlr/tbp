@@ -8,7 +8,7 @@ from setuptools import setup
 from distutils.command.build import build
 from shutil import copyfile
 
-VERSION = (0, 0, 37)
+VERSION = (0, 1, 0)
 BASEPATH = os.path.dirname(os.path.abspath(__file__))
 LIBDAI_PATH = os.path.join(BASEPATH, 'libdai')
 README = os.path.join(BASEPATH, 'README.md')

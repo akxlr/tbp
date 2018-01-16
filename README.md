@@ -2,11 +2,9 @@
 
 [![Build Status](https://travis-ci.org/akxlr/tbp.svg?branch=master)](https://travis-ci.org/akxlr/tbp)
 
-[Tensor Belief Propagation](http://proceedings.mlr.press/v70/wrigley17a/wrigley17a.pdf) (TBP) is an algorithm for
+[Tensor Belief Propagation](http://proceedings.mlr.press/v70/wrigley17a/wrigley17a.pdf) (TBP) is an experimental algorithm for
 approximate inference in discrete graphical models [1]. At a high level, it takes a factor graph in [.uai](#other-file-formats) or [.fg](#other-file-formats) format and outputs approximate marginals for
 each variable.
-
-This code should be considered experimental.
 
 [1] [Wrigley, Andrew, Wee Sun Lee, and Nan Ye. "Tensor Belief Propagation." International Conference on Machine Learning. 2017.](http://proceedings.mlr.press/v70/wrigley17a/wrigley17a.pdf)
 
@@ -85,9 +83,20 @@ mar = dg.tbp_marg(K=10000)
 ```
 
 ### Troubleshooting
- * If the command line utility `tbp` is not found after installation, re-run the installation with `pip install tbp -v` to find where
-the `tbp` binary is installed to (look for `Installing tbp script to...`), and check that this location is on your system `$PATH`.
- * To use the `tbp` Python package from source without installation via `pip install`, libDAI must first be compiled. To do this:
+#### Installing into a virtual environment
+If you find `pip install` has issues with dependencies or version conflicts, try installing all the necessary
+ packages into a virtual environment (i.e. a project-specific folder rather than globally on your system):
+```bash
+$ sudo pip3 install virtualenv  # pip or pip3, depending on your system
+$ virtualenv -p python3 venv    # create venv folder to store packages
+$ source venv/bin/activate      # activate virtual environment
+$ pip install tbp               # install tbp into venv folder
+```
+Now, anything you `pip install` will be stored in the `venv` folder, and when
+you invoke `python` or `tbp`, the local versions will be used.
+
+#### Building from GitHub clone
+To use the `tbp` Python package from source without installation via `pip install`, libDAI must first be compiled. To do this:
  
 ```bash
 $ git clone git@github.com:akxlr/tbp.git
@@ -114,9 +123,9 @@ You can now replace `method='tensorly'` with `method='matlab'` when calling deco
 
 
 ## ICML experiments
-The results from [1] can be reproduced with:
+The results from Figure 1 and Figure 3 in [1] can be reproduced with:
 ```
-$ python3 python/tbp/icml17.py
+$ python tbp/icml17.py
 ```
 Note that these tests take considerable time to finish.
 
@@ -177,7 +186,7 @@ Other file formats used in this project are:
  * Add experiments from Figure 2 (random pairwise MRFs)
  * Rewrite code that loads .uai files to handle all problems (currently breaks on some)
  * Deal with Z <= 0 warning from C++ code
- * Add Python tests to Travis
+ * Add more tests
 
 ## Feedback
 Bug reports, suggestions and comments are welcome. Please email [andrew@wrigley.io](mailto:andrew@wrigley.io) or use the issue tracker.

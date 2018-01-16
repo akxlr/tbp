@@ -7,8 +7,9 @@ Author: Andrew Wrigley, National University of Singapore and Australian National
 import glob
 import os
 from typing import List, Tuple
-import core
+import tbp
 
+BASE_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../')
 
 def load_fig1_tests() -> List[Tuple]:
     """
@@ -22,18 +23,17 @@ def load_fig1_tests() -> List[Tuple]:
 
     test_name = 'ising_{}_mixed'.format(N)
     print("Generating test case {}".format(test_name))
-    g, dg = core.ising_g(N, -unary_str, unary_str, -pairwise_str, pairwise_str)
+    g, dg = tbp.ising_g(N, -unary_str, unary_str, -pairwise_str, pairwise_str)
     true_marg = g.exact_marg_elim()
     tests.append((test_name, g, dg, true_marg))
 
     test_name = 'ising_{}_attractive'.format(N)
     print("Generating test case {}".format(test_name))
-    g, dg = core.ising_g(N, -unary_str, unary_str, 0, pairwise_str)
+    g, dg = tbp.ising_g(N, -unary_str, unary_str, 0, pairwise_str)
     true_marg = g.exact_marg_elim()
     tests.append((test_name, g, dg, true_marg))
 
     return tests
-
 
 def load_uai_tests(globs, r, force=False) -> List[Tuple]:
     """
@@ -46,9 +46,9 @@ def load_uai_tests(globs, r, force=False) -> List[Tuple]:
     """
 
     # Path that contains .uai files
-    prob_folder = os.path.join(core.BASE_DIR, 'tests/uai/MAR_prob')
+    prob_folder = os.path.join(BASE_DIR, 'tests/uai/MAR_prob')
     # Path that contains .uai.MAR files
-    sol_folder = os.path.join(core.BASE_DIR, 'tests/uai/MAR_sol')
+    sol_folder = os.path.join(BASE_DIR, 'tests/uai/MAR_sol')
 
     filenames = []
     for pattern in globs:
@@ -62,8 +62,8 @@ def load_uai_tests(globs, r, force=False) -> List[Tuple]:
 
         # Load graph
         try:
-            g = core.load_uai_graph(prob_filename)
-        except core.BadGraphException:
+            g = tbp.load_uai_graph(prob_filename)
+        except tbp.BadGraphException:
             print("Graph {} could not be loaded, skipping".format(prob_filename))
             continue
 
@@ -75,7 +75,7 @@ def load_uai_tests(globs, r, force=False) -> List[Tuple]:
         decomp_filename = '{}.r={}.dfg'.format(prob_filename.replace('.uai', ''), r)
         if os.path.isfile(decomp_filename) and not force:
             print("Using existing decomposition {}".format(decomp_filename))
-            dg = core.load_decomposed_graph(decomp_filename)
+            dg = tbp.load_decomposed_graph(decomp_filename)
         else:
             dg = g.decompose(r)
             dg.save_to_file(decomp_filename)
@@ -83,7 +83,7 @@ def load_uai_tests(globs, r, force=False) -> List[Tuple]:
 
         # Load true marginals
         sol_filename = os.path.join(sol_folder, '{}.MAR'.format(os.path.basename(prob_filename)))
-        true_marg = core.load_mar(sol_filename)
+        true_marg = tbp.load_mar(sol_filename)
         tests.append((test_name, g, dg, true_marg))
 
     return tests
@@ -94,9 +94,9 @@ def main():
     tests_uai_2 = load_uai_tests(['linkage_*.uai', 'Promedus_*.uai'], r=2)
     tests_uai_4 = load_uai_tests(['linkage_*.uai', 'Promedus_*.uai'], r=4)
 
-    core.run_tests(tests_ising, [10, 100, 1000, 10000, 100000], binary_err=True)
-    core.run_tests(tests_uai_2, [10, 100, 1000, 10000])
-    core.run_tests(tests_uai_4, [10, 100, 1000, 10000])
+    tbp.run_tests(tests_ising, [10, 100, 1000, 10000, 100000], binary_err=True)
+    tbp.run_tests(tests_uai_2, [10, 100, 1000, 10000])
+    tbp.run_tests(tests_uai_4, [10, 100, 1000, 10000])
 
 
 if __name__ == '__main__':

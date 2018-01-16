@@ -23,7 +23,7 @@ class HelpfulParser(argparse.ArgumentParser):
         sys.exit(2)
 
 
-def _marg(in_file, r=None, K=None, evid_file=None, out_file=None, verbosity=None):
+def _marg(in_file, r=None, K=None, evid_file=None, out_file=None, exact=False, verbosity=None):
 
     if r is not None:
         r = int(r)
@@ -49,6 +49,7 @@ def _marg(in_file, r=None, K=None, evid_file=None, out_file=None, verbosity=None
     if in_extn == '.dfg':
 
         assert not evid_file, "Cannot apply evidence to .dfg - supply the original graph instead"
+        assert not exact, "Cannot compute exact marginals for .dfg - supply the original graph instead"
         status("Reading decomposed graph {}...".format(in_file), 2)
         dg = core.load_decomposed_graph(in_file)
 
@@ -65,16 +66,23 @@ def _marg(in_file, r=None, K=None, evid_file=None, out_file=None, verbosity=None
             status("Applying evidence file {}...".format(evid_file), 2)
             g.apply_evidence(evid_file)
 
-        status("Decomposing input graph (r={} terms per factor)...".format(r), 2)
-        dg = g.decompose(r)
+        if not exact:
+            status("Decomposing input graph (r={} terms per factor)...".format(r), 2)
+            dg = g.decompose(r)
+
 
     if out_extn == '.dfg':
         dg.save_to_file(out_file)
         status("Successfully saved decomposed graph to {}.".format(out_file), 2)
         return
 
-    status("Running TBP with sample size K={}...".format(K), 2)
-    mar = dg.tbp_marg(K)
+    if exact:
+        status("Computing exact marginals...".format(r), 2)
+        mar = g.exact_marg_elim()
+
+    else:
+        status("Running TBP with sample size K={}...".format(K), 2)
+        mar = dg.tbp_marg(K)
 
     if out_extn == '.MAR':
         with open(out_file, 'w') as f:
@@ -134,13 +142,20 @@ def main():
         '-o',
         '--output',
         help="File to save output to. The action taken depends on the file extension - supply *.MAR to save marginals,"
-             "or *.dfg to save the decomposed graph and not compute marginals. If not supplied, marginals are printed"
+             "or *.dfg to save the decomposed graph and not compute marginals. If not supplied, marginals are printed "
              "to stdout in MAR format."
+    )
+    parser.add_argument(
+        '-x',
+        '--exact',
+        action='store_true',
+        help="Instead of computing approximate marginals with TBP, compute exact marginals by running the elimination "
+             "algorithm on each variable in turn (very inefficient, use only for very small graphs)."
     )
 
     args = vars(parser.parse_args())
     _marg(in_file=args['in_file'], r=args['rank'], K=args['sample_size'], evid_file=args['evidence'],
-          out_file=args['output'], verbosity=args['verbosity'])
+          out_file=args['output'], exact=args['exact'], verbosity=args['verbosity'])
 
 
 
