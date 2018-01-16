@@ -20,7 +20,6 @@ def test_small_ising():
     print("Decomposing graph")
     dg = g.decompose(r=2)
     print("Running TBP")
-    mar = dg.tbp_marg(k=100000)
-    # Error should be around 0.002-0.003
+    mar = dg.tbp_marg(k=10000)
     assert tbp.l1_error(mar, true_mar) <= 0.01
 
