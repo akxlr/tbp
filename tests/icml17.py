@@ -5,44 +5,116 @@ Author: Andrew Wrigley, National University of Singapore and Australian National
 """
 
 import glob
+import json
 import os
 from typing import List, Tuple
 import tbp
+import time
+import numpy as np
+from collections import defaultdict
+from matplotlib import pyplot as plt
 
 BASE_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../')
 
-def load_fig1_tests() -> List[Tuple]:
+
+def run_tests(tests, marg_params=None, binary_err=False):
     """
-    Load the Ising model tests used to produce Wrigley, Lee and Ye (2017), Figure 1.
+    :param tests: List of tests, each of which is a dict with keys {name, g, dg, ks, true_marg, plot_series}.
+    :return: None; adds a new key `results` to each test, whose value is a dict {k -> {infer_time, pred_marg, err}}.
     """
 
-    unary_str = 1
-    pairwise_str = 2
-    N = 10
-    tests = []
+    for i, test in enumerate(tests):
 
-    test_name = 'ising_{}_mixed'.format(N)
-    print("Generating test case {}".format(test_name))
-    g, dg = tbp.ising_g(N, -unary_str, unary_str, -pairwise_str, pairwise_str)
-    true_marg = g.exact_marg_elim()
-    tests.append((test_name, g, dg, true_marg))
+        print("Running test {} of {}: {}".format(i+1, len(tests), test['name']))
 
-    test_name = 'ising_{}_attractive'.format(N)
-    print("Generating test case {}".format(test_name))
-    g, dg = tbp.ising_g(N, -unary_str, unary_str, 0, pairwise_str)
-    true_marg = g.exact_marg_elim()
-    tests.append((test_name, g, dg, true_marg))
+        results = {}
+        for k in test['ks']:
+            results[k] = {}
+            t0 = time.time()
+            results[k]['pred_marg'] = test['dg'].tbp_marg(k=k,
+                **(marg_params if marg_params else {}))
+            results[k]['infer_time'] = time.time() - t0
+            results[k]['marg_err'] = tbp.l1_error(results[k]['pred_marg'], test['true_marg'], binary=binary_err)
+            print("  (k={}) Mean L1 error: {}".format(k, results[k]['marg_err']))
 
-    return tests
+        test['results'] = results
 
-def load_uai_tests(globs, r, force=False) -> List[Tuple]:
+
+def save_plot(results, name):
     """
-    Load all UAI tests matching any glob patterns in globs.
+    :param results: Dict prepared for plotting in the form {series_label ->
+    :return:
+    """
+
+    # # Add padding so we can see the markers
+    # xticks, xticklabels = plt.xticks()
+    # xmin = (3 * xticks[0] - xticks[1]) / 2.
+    # xmax = (3 * xticks[-1] - xticks[-2]) / 2.
+    # plt.xlim(xmin, xmax)
+    # plt.xticks(xticks)
+
+    # Draw plot
+    plt.title(name)
+    plt.xlabel("Sample size K")
+    plt.xscale('log')
+    plt.ylabel("Average classification error")
+    # markers = ['-.co', '-ks', ':g^', '-ks', '-.ks', ':g', '-m', '-.y', '--r^']
+
+    for series_label in results.keys():
+        ks = sorted(results[series_label].keys())
+        plt.plot(ks, [results[series_label][k] for k in ks], label=series_label)
+
+    plt.legend(loc='best', ncol=3)
+    file_id = time.time()
+    plot_filename = "plots/%s-%s.png" % (name, file_id)
+    plt.savefig(plot_filename)
+    plt.gcf().clear()
+    print("%s saved\n" % plot_filename)
+    with open("plots/sourcedata_%s.json" % file_id, 'w') as f:
+        print(json.dumps(results), file=f)
+
+
+def plot_tests(tests, name):
+    """
+    Plot classification error versus sample size k.
+    :param tests: As per run_tests, after invoking run_tests to fill results.
+    """
+
+    # Collect into groups according to plot_series key
+    series = defaultdict(list)
+    for test in tests:
+        if 'plot_series' not in test:
+            test['plot_series'] = '(no label)'
+        series[test['plot_series']].append(test)
+
+    results = {}
+    for series_label in series.keys():
+        # Average together the error of all tests with the same plot_series
+        results[series_label] = defaultdict(list)
+        for test in series[series_label]:
+            for k in test['ks']:
+                results[series_label][k].append(test['results'][k]['marg_err'])
+        for k in results[series_label].keys():
+            results[series_label][k] = np.mean(results[series_label][k])
+
+    save_plot(results, name)
+
+
+def plot_from_files(*files):
+    results = {}
+    for filename in files:
+        with open(filename, 'r') as f:
+            results.update(json.loads(f.read()))
+    save_plot(results)
+
+
+def load_uai_tests(globs, r, ks, force=False) -> List[Tuple]:
+    """
+    Load all UAI tests matching any glob pattern in globs.
     :param r: Number of rank-1 terms to use for tensor decomposition
     :param force: Force all input graphs to be decomposed again, otherwise files with an existing decomposition are
     skipped.
-    :return: list of tests of the form (test_name, g, dg, true_marg) where g is the non-decomposed graph and dg the
-    corresponding decomposed graph previously saved with decompose_all().
+    :return: list of tests, each of which is a dict as per run_tests.
     """
 
     # Path that contains .uai files
@@ -84,21 +156,96 @@ def load_uai_tests(globs, r, force=False) -> List[Tuple]:
         # Load true marginals
         sol_filename = os.path.join(sol_folder, '{}.MAR'.format(os.path.basename(prob_filename)))
         true_marg = tbp.load_mar(sol_filename)
-        tests.append((test_name, g, dg, true_marg))
+        tests.append({
+            'name': test_name,
+            'g': g,
+            'dg': dg,
+            'ks': ks,
+            'true_marg': true_marg,
+        })
 
     return tests
 
 
-def main():
-    tests_ising = load_fig1_tests()
-    tests_uai_2 = load_uai_tests(['linkage_*.uai', 'Promedus_*.uai'], r=2)
-    tests_uai_4 = load_uai_tests(['linkage_*.uai', 'Promedus_*.uai'], r=4)
+def load_fig1_tests(ks, sample_size=100) -> List[Tuple]:
+    """
+    Load the Ising model tests used to produce Wrigley, Lee and Ye (2017), Figure 1.
+    """
 
-    tbp.run_tests(tests_ising, [10, 100, 1000, 10000, 100000], binary_err=True)
-    tbp.run_tests(tests_uai_2, [10, 100, 1000, 10000])
-    tbp.run_tests(tests_uai_4, [10, 100, 1000, 10000])
+    unary_str = 1
+    pairwise_str = 2
+    N = 10
+    tests = []
+
+    for i in range(sample_size):
+        test_name = 'ising_{}_mixed_{}'.format(N, i)
+        print("Generating test case {}".format(test_name))
+        g, dg = tbp.ising_g(N, -unary_str, unary_str, -pairwise_str, pairwise_str)
+        true_marg = g.exact_marg_elim()
+        tests.append({
+            'name': test_name,
+            'g': g,
+            'dg': dg,
+            'ks': ks,
+            'plot_series': 'mixed',
+            'true_marg': true_marg,
+        })
+
+    for i in range(sample_size):
+        test_name = 'ising_{}_attractive_{}'.format(N, i)
+        print("Generating test case {}".format(test_name))
+        g, dg = tbp.ising_g(N, -unary_str, unary_str, 0, pairwise_str)
+        true_marg = g.exact_marg_elim()
+        tests.append({
+            'name': test_name,
+            'g': g,
+            'dg': dg,
+            'ks': ks,
+            'plot_series': 'attractive',
+            'true_marg': true_marg,
+        })
+
+    return tests
 
 
-if __name__ == '__main__':
-    main()
+def run_fig1():
+    tests_ising = load_fig1_tests(ks=[10, 100, 1000, 10000, 100000], sample_size=20)
+    tests_ising_mult = load_fig1_tests(ks=[10, 100, 1000, 10000, 100000], sample_size=20)
+    # tests_ising = load_fig1_tests(ks=[10, 100], sample_size=2)
+    # tests_ising_mult = load_fig1_tests(ks=[10, 100], sample_size=2)
+
+    run_tests(tests_ising, binary_err=True)
+    run_tests(tests_ising_mult, binary_err=True, marg_params={'naive_mult': True})
+
+    mixed = []
+    attractive = []
+    for test in tests_ising:
+        if test['plot_series'] == 'mixed':
+            test['plot_series'] = 'tbp'
+            mixed.append(test)
+        elif test['plot_series'] == 'attractive':
+            test['plot_series'] = 'tbp'
+            attractive.append(test)
+
+    for test in tests_ising_mult:
+        if test['plot_series'] == 'mixed':
+            test['plot_series'] = 'tbp_mult_all_linear'
+            mixed.append(test)
+        elif test['plot_series'] == 'attractive':
+            test['plot_series'] = 'tbp_mult_all_linear'
+            attractive.append(test)
+
+    plot_tests(mixed, 'icml17-ising-mixed')
+    plot_tests(attractive, 'icml17-ising-attractive')
+
+def run_uai():
+    tests_uai_2 = load_uai_tests(['linkage_*.uai', 'Promedus_*.uai'], r=2, ks=[10, 100, 1000, 10000])
+    tests_uai_4 = load_uai_tests(['linkage_*.uai', 'Promedus_*.uai'], r=4, ks=[10, 100, 1000, 10000])
+    run_tests(tests_uai_2)
+    run_tests(tests_uai_4)
+
+def run_all():
+    run_fig1()
+    run_uai()
+
 

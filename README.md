@@ -122,13 +122,6 @@ library. As an alternative to TensorLy, the [MATLAB Tensor Toolbox](http://www.s
 You can now replace `method='tensorly'` with `method='matlab'` when calling decomposition functions in [core.py](python/tbp/core.py).
 
 
-## ICML experiments
-The results from Figure 1 and Figure 3 in [1] can be reproduced with:
-```
-$ python tbp/icml17.py
-```
-Note that these tests take considerable time to finish.
-
 ## File formats
 
 ### .dfg (decomposed factor graph)
@@ -183,9 +176,10 @@ Other file formats used in this project are:
  * `.evid` (evidence): http://www.hlt.utdallas.edu/~vgogate/uai14-competition/evidformat.html
 
 ## To do
- * Add experiments from Figure 2 (random pairwise MRFs)
+ * ICML experiments - finish cleaning code used for experiments (see `icml17.py` for partial code)
  * Rewrite code that loads .uai files to handle all problems (currently breaks on some)
  * Deal with Z <= 0 warning from C++ code
+ * Clean up C++ code and compiler warnings
  * Add more tests
 
 ## Feedback
