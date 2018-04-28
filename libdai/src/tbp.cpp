@@ -51,59 +51,18 @@ namespace dai {
             factors[i].reweight();
         }
 
-        // Naive variable ordering (for Ising models, this is just a raster scan)
-        DFactor prod = factors[0];
-        for (size_t i=1; i<factors.size(); ++i) {
-            prod *= factors[i];
-        }
+        FactorGraph fg(factors);
 
-        // Smarter ordering: repeatedly multiple the two factors with the lowest sum of weights (after reweighting)
-//        while (factors.size() > 1) {
-//            // Find the two factors with the lowest sum of weights
-//            size_t min_idx[2];
-//            double min_val[2] = {DBL_MAX};
-//            for (size_t i=0; i<factors.size(); ++i) {
-//                double weight_sum = factors[i].weights.sum();
-//                if (weight_sum < min_val[0]) {
-//                    // insert into 0 and push 0 to 1
-//                    min_val[1] = min_val[0];
-//                    min_val[0] = weight_sum;
-//                    min_idx[1] = min_idx[0];
-//                    min_idx[0] = i;
-//                } else if (weight_sum < min_val[1]) {
-//                    // insert into 1
-//                    min_val[1] = weight_sum;
-//                    min_idx[1] = i;
-//                }
-//            }
-//            // Multiple the second-smallest weight sum factor onto the smallest, then delete it from the list of factors
-//            factors[min_idx[0]] *= factors[min_idx[1]];
-//            factors.erase(factors.begin() + min_idx[1]);
-//        }
-//        DFactor prod = factors[0];
+        PropertySet opts;
+        opts.set("verbose",(size_t)0);       // Verbosity (amount of output generated)
 
+        JTree jt(fg, opts("updates",string("SHSH")));
 
-        // Find marginals
-        // See also: dfactor.cpp DFactor::marginal, which is what the tbp_marg uses to marginalise out sets of
-        // variables. The below is more efficient since we're doing this for each variable in turn.
+        jt.init();
+        jt.run();
 
-        // Column sums for each variable
-        size_t n_vars = prod.factors.size();
-        vector<Eigen::VectorXd> colsums(n_vars);
-        for (size_t i=0; i<n_vars; ++i) {
-            colsums[i] = prod.factors[i].colwise().sum();
-            // Multiply column sum onto weights (we store colsums so we can later divide out each variable in turn)
-            prod.weights.array() *= colsums[i].array();
-        }
+        return jt.full_prod_all_beliefs();
 
-        // Compute marginals by simplifying each variable to use only one term
-        vector<Eigen::VectorXd> res(n_vars);
-        for (size_t i=0; i<n_vars; ++i) {
-            // Matrix-vector product
-            res[i] = prod.factors[i] * (prod.weights.array() / colsums[i].array()).matrix();
-        }
-
-        return res;
     }
 
 
