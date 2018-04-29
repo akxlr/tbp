@@ -167,7 +167,7 @@ def load_uai_tests(globs, r, ks, force=False) -> List[Tuple]:
     return tests
 
 
-def load_fig1_tests(ks, sample_size=100) -> List[Tuple]:
+def load_ising_tests(ks, sample_size=100) -> List[Tuple]:
     """
     Load the Ising model tests used to produce Wrigley, Lee and Ye (2017), Figure 1.
     """
@@ -208,35 +208,36 @@ def load_fig1_tests(ks, sample_size=100) -> List[Tuple]:
     return tests
 
 
-def run_fig1():
-    tests_ising = load_fig1_tests(ks=[10, 100, 1000, 10000, 100000], sample_size=20)
-    tests_ising_mult = load_fig1_tests(ks=[10, 100, 1000, 10000, 100000], sample_size=20)
+def run_ising():
+   # tests_ising = load_fig1_tests(ks=[10, 100, 1000, 10000, 100000], sample_size=20)
+    tests_ising_mult = load_ising_tests(ks=[10, 100, 1000, 10000, 100000], sample_size=20)
     # tests_ising = load_fig1_tests(ks=[10, 100], sample_size=2)
     # tests_ising_mult = load_fig1_tests(ks=[10, 100], sample_size=2)
 
-    run_tests(tests_ising, binary_err=True)
+    # run_tests(tests_ising, binary_err=True)
     run_tests(tests_ising_mult, binary_err=True, marg_params={'naive_mult': True})
 
-    mixed = []
-    attractive = []
-    for test in tests_ising:
-        if test['plot_series'] == 'mixed':
-            test['plot_series'] = 'tbp'
-            mixed.append(test)
-        elif test['plot_series'] == 'attractive':
-            test['plot_series'] = 'tbp'
-            attractive.append(test)
+    plot_tests(tests_ising_mult, 'icml17-jtree-mult-all')
 
-    for test in tests_ising_mult:
-        if test['plot_series'] == 'mixed':
-            test['plot_series'] = 'tbp_mult_all_linear'
-            mixed.append(test)
-        elif test['plot_series'] == 'attractive':
-            test['plot_series'] = 'tbp_mult_all_linear'
-            attractive.append(test)
+    # mixed = []
+    # attractive = []
+    # for test in tests_ising:
+    #     if test['plot_series'] == 'mixed':
+    #         test['plot_series'] = 'tbp'
+    #         mixed.append(test)
+    #     elif test['plot_series'] == 'attractive':
+    #         test['plot_series'] = 'tbp'
+    #         attractive.append(test)
+    # for test in tests_ising_mult:
+    #     if test['plot_series'] == 'mixed':
+    #         test['plot_series'] = 'tbp_mult_all_linear'
+    #         mixed.append(test)
+    #     elif test['plot_series'] == 'attractive':
+    #         test['plot_series'] = 'tbp_mult_all_linear'
+    #         attractive.append(test)
 
-    plot_tests(mixed, 'icml17-ising-mixed')
-    plot_tests(attractive, 'icml17-ising-attractive')
+    # plot_tests(mixed, 'icml17-ising-mixed')
+    # plot_tests(attractive, 'icml17-ising-attractive')
 
 def run_uai():
     tests_uai_2 = load_uai_tests(['linkage_*.uai', 'Promedus_*.uai'], r=2, ks=[10, 100, 1000, 10000])
@@ -245,7 +246,7 @@ def run_uai():
     run_tests(tests_uai_4)
 
 def run_all():
-    run_fig1()
+    run_ising()
     run_uai()
 
 
