@@ -671,6 +671,7 @@ DFactor DFactor::slice( const VarSet& vars, size_t varsState ) const {
 
 /* USED_BY_JTREE */
 DFactor DFactor::marginal(const VarSet &vars, bool normed) const {
+    // Marginalise out all variables in this factor that are not in `vars`, and then reweight. `normed` does nothing here.
 
     DFactor res(*this);
     res.vs = vs & vars;
@@ -688,6 +689,7 @@ DFactor DFactor::marginal(const VarSet &vars, bool normed) const {
 
     // If there is only one variable in resulting factor, we can simplify further to only use one term
     if (res.factors.size() == 1) {
+        // Matrix-vector product
         res.factors[0] = res.factors[0] * res.weights;
         // A vector with one element equal to 1
         Eigen::VectorXd one(1,1);
