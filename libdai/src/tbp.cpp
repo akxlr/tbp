@@ -7,7 +7,6 @@ namespace dai {
 
     int tbp_sample_size;
 
-    /// Given a decomposed graph, run TBP with sample size k and return marginals.
     vector<Eigen::VectorXd> tbp_marg(vector<DFactor> factors, int k) {
 
         tbp_sample_size = k;
@@ -40,31 +39,6 @@ namespace dai {
 
         return res;
     }
-
-
-    /// Instead of running junction tree, just multiply all factors together and marginalise.
-    vector<Eigen::VectorXd> tbp_marg_naive(vector<DFactor> factors, int k) {
-
-        tbp_sample_size = k;
-
-        for (size_t i=0; i<factors.size(); ++i) {
-            factors[i].reweight();
-        }
-
-        FactorGraph fg(factors);
-
-        PropertySet opts;
-        opts.set("verbose",(size_t)0);       // Verbosity (amount of output generated)
-
-        JTree jt(fg, opts("updates",string("SHSH")));
-
-        jt.init();
-        jt.run();
-
-        return jt.full_prod_all_beliefs();
-
-    }
-
 
     /// Reads a decomposed graph from an input stream
     std::vector<dai::DFactor> read_dfg_from_stream(std::istream& is) {

@@ -23,7 +23,7 @@ class HelpfulParser(argparse.ArgumentParser):
         sys.exit(2)
 
 
-def _marg(in_file, r=None, K=None, evid_file=None, out_file=None, exact=False, verbosity=None, mult_all=False):
+def _marg(in_file, r=None, K=None, evid_file=None, out_file=None, exact=False, verbosity=None):
 
     if r is not None:
         r = int(r)
@@ -45,8 +45,6 @@ def _marg(in_file, r=None, K=None, evid_file=None, out_file=None, exact=False, v
         raise ValueError("Unknown graph file format: {} (supported: .fg, .uai, .dfg)".format(in_extn))
     if out_extn and out_extn not in ['.dfg', '.MAR']:
         raise ValueError("Unknown output format: {} (supported: .dfg, .MAR)".format(out_extn))
-    if mult_all:
-        assert not exact, "--mult-all option cannot be supplied together with --exact"
 
     if in_extn == '.dfg':
 
@@ -84,7 +82,7 @@ def _marg(in_file, r=None, K=None, evid_file=None, out_file=None, exact=False, v
 
     else:
         status("Running TBP with sample size K={}...".format(K), 2)
-        mar = dg.tbp_marg(K, naive_mult=mult_all)
+        mar = dg.tbp_marg(K)
 
     if out_extn == '.MAR':
         with open(out_file, 'w') as f:
@@ -155,17 +153,9 @@ def main():
              "algorithm on each variable in turn (very inefficient, use only for very small graphs)."
     )
 
-    parser.add_argument(
-        '-m',
-        '--mult-all',
-        action='store_true',
-        help="Instead of running junction tree algorithm on the decomposed graph, just multiply all potential "
-             "functions together using sampling and then marginalise."
-    )
-
     args = vars(parser.parse_args())
     _marg(in_file=args['in_file'], r=args['rank'], K=args['sample_size'], evid_file=args['evidence'],
-          out_file=args['output'], exact=args['exact'], verbosity=args['verbosity'], mult_all=args['mult_all'])
+          out_file=args['output'], exact=args['exact'], verbosity=args['verbosity'])
 
 
 

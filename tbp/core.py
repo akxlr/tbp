@@ -468,20 +468,16 @@ class DecomposedGraph(Graph):
         with open(filename, 'w') as f:
             f.write(str(self))
 
-    def tbp_marg(self, k=DEFAULT_SAMPLE_SIZE, naive_mult=False):
+    def tbp_marg(self, k=DEFAULT_SAMPLE_SIZE):
         """
         Call libdai/utils/dfgmarg binary via pipe to get approximate marginals.
         :param k: TBP sample size
-        :param naive_mult: If True, instead of running junction tree algorithm just multiply all factors together
         by sampling, and then marginalise once.
         :return: Marginals as list of lists.
         """
-        p = subprocess.run([TBP_BINARY, str(k), "--mult-all"] if naive_mult else [TBP_BINARY, str(k)], stdout=subprocess.PIPE,
+        p = subprocess.run([TBP_BINARY, str(k)], stdout=subprocess.PIPE,
                            input=str(self), encoding='ascii')
         assert p.returncode == 0
-
-        # if naive_mult:
-        #     print("WARNING: Using naive multiplication, not junction tree algorithm!")
 
         # Marginals are returned in .MAR format, convert this to list of lists
         marginals = []
@@ -848,16 +844,5 @@ def format_mar(marg):
     return ' '.join(str(x) for x in fields)
 
 
-# def run_tests(tests, ks, binary_err=False, mult_all=False):
-#
-#     for i, (name, g, dg, true_marg) in enumerate(tests):
-#         print("Running test '{}' ({} of {})".format(name, i + 1, len(tests)))
-#         components = g.show_stats()
-#         print("Results:")
-#         for k in ks:
-#             marg_est = dg.tbp_marg(k, naive_mult=mult_all)
-#             err = l1_error(marg_est, true_marg, binary_err)
-#             print("  (k={}) Mean L1 error: {}".format(k, err))
-#         print("")
 
 
