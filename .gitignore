@@ -1,7 +1,5 @@
-libdai/Makefile.conf
 *.o
 *.dSYM
-tests/uai/MAR_prob/*.dfg
 __pycache__/
 .idea/
 .DS_Store
@@ -9,3 +7,14 @@ dist/
 *.egg-info/
 build/
 .cache
+
+tests/uai/MAR_prob/*.dfg
+tests/plots
+libdai/Makefile.conf
+libdai/lib/libdai.a
+libdai/utils/createfg
+libdai/utils/dfgmarg
+libdai/utils/fg2dot
+libdai/utils/fginfo
+libdai/utils/uai2fg
+libdai/utils/viewfg
