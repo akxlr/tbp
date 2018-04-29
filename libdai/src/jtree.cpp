@@ -357,7 +357,7 @@ void JTree::runShaferShenoy() {
             if( k != e )
                 msg *= message( i, k.iter );
         if( props.inference == Properties::InfType::SUMPROD ) {
-            cerr << "(Skipping marginalisation step)" << endl;
+//            cerr << "(Skipping marginalisation step)" << endl;
             // message() is defined in jtree.h, returns a constant reference to the message
             message (j, _e ) = msg;
 //            message( j, _e ) = msg.marginal( IR(e), false );
@@ -367,7 +367,7 @@ void JTree::runShaferShenoy() {
         }
         _logZ += log( message(j,_e).normalize() );
     }
-    cerr << "Finished first pass, computing marginals immediately from message product at root" << endl;
+//    cerr << "Finished first pass, computing marginals immediately from message product at root" << endl;
 
     // TODO instead of whatever this does, we want to just marginalise the mega-potential that should now be
     // at the root
