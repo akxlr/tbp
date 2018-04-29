@@ -811,7 +811,7 @@ def l1_error(marg_1, marg_2, binary=False):
     :param marg_1: List of lists containing marginals
     :param marg_2: List of lists containing marginals
     :param binary: Set to true if computing errors for binary variables to return the average error in P(X=0), ignoring
-    P(X=1).
+    P(X=1) (no difference to result, just slightly more efficient).
     :return: Mean error over all marginals.
     """
 
@@ -826,9 +826,10 @@ def l1_error(marg_1, marg_2, binary=False):
         if binary:
             assert len(marg_1[i]) == 2
             err += np.abs(marg_1[i][0] - marg_2[i][0])
+            n += 1
         else:
             err += np.sum([np.abs(marg_1[i][j] - marg_2[i][j]) for j in range(len(marg_1[i]))])
-        n += len(marg_1[i])
+            n += len(marg_1[i])
     return err / n
 
 

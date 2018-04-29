@@ -46,6 +46,9 @@ def save_plot(results, name):
     :return:
     """
 
+    if not os.path.exists('plots'):
+        os.makedirs('plots')
+
     # # Add padding so we can see the markers
     # xticks, xticklabels = plt.xticks()
     # xmin = (3 * xticks[0] - xticks[1]) / 2.
@@ -222,5 +225,8 @@ def run_uai():
 def run_all():
     run_ising()
     run_uai()
+
+if __name__ == '__main__':
+    run_ising()
 
 
