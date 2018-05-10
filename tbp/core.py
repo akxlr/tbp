@@ -805,6 +805,42 @@ def ising_g(N, unary_min, unary_max, pairwise_min, pairwise_max):
     return Graph(g), DecomposedGraph(dg)
 
 
+def random_g(N, edge_prob, unary_min, unary_max, pairwise_min, pairwise_max):
+    """
+    Connected N-variable MRF with Ising potentials uniformly chosen within the given limits. Each possible edge is
+    present with independent probability edge_prob.
+    :return: Tuple (g, dg) containing the MRF as a Graph and DecomposedGraph instance respectively. The tensor
+    decomposition used is described in Wrigley, Lee and Ye (2017), supplementary material.
+    """
+    g = []
+    dg = []
+    while not g or len(Graph(g).get_connected_components()) > 1:
+        for i in range(N):
+
+            # Unary potential
+            theta = np.random.uniform(unary_min, unary_max)
+            g.append(Factor([i], np.exp([theta, -theta])))
+            dg.append(DecomposedFactor([i], np.array([1.0]), [np.exp([[theta], [-theta]])]))
+
+            for j in range(i + 1, N):
+
+                if np.random.rand() < edge_prob:
+
+                    # Pairwise potential
+                    theta = np.random.uniform(pairwise_min, pairwise_max)
+                    f = Factor([i, j], np.exp([[theta, -theta], [-theta, theta]]))
+                    G, H = factorise_ising(np.exp(theta))
+                    df = DecomposedFactor([i, j], np.array([1.0, 1.0]), [G, H])
+
+                    # Check decomposed potential is equal to original
+                    assert df.expand() == f
+
+                    g.append(f)
+                    dg.append(df)
+
+    return Graph(g), DecomposedGraph(dg)
+
+
 def l1_error(marg_1, marg_2, binary=False):
     """
     Mean L1 marginal error.

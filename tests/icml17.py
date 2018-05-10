@@ -211,10 +211,61 @@ def load_ising_tests(ks, sample_size=100) -> List[Tuple]:
     return tests
 
 
+def load_random_tests(ks, sample_size=100) -> List[Tuple]:
+    """
+    Load the random MRF tests used to produce Wrigley, Lee and Ye (2017), Figure 2.
+    """
+
+    unary_str = 1
+    pairwise_str = 2
+    edge_prob = 0.5
+    N = 15
+    tests = []
+
+    # First two tests - varying k
+    for i in range(sample_size):
+        test_name = 'random_k_{}_mixed_{}'.format(N, i)
+        print("Generating test case {}".format(test_name))
+        g, dg = tbp.random_g(N, edge_prob, -unary_str, unary_str, -pairwise_str, pairwise_str)
+        true_marg = g.exact_marg_elim()
+        tests.append({
+            'name': test_name,
+            'g': g,
+            'dg': dg,
+            'ks': ks,
+            'plot_series': 'mixed',
+            'true_marg': true_marg,
+        })
+
+    for i in range(sample_size):
+        test_name = 'random_k_{}_attractive_{}'.format(N, i)
+        print("Generating test case {}".format(test_name))
+        g, dg = tbp.random_g(N, edge_prob, -unary_str, unary_str, 0, pairwise_str)
+        true_marg = g.exact_marg_elim()
+        tests.append({
+            'name': test_name,
+            'g': g,
+            'dg': dg,
+            'ks': ks,
+            'plot_series': 'attractive',
+            'true_marg': true_marg,
+        })
+
+    # TODO Second two tests - varying N
+
+
+    return tests
+
 def run_ising():
     tests_ising = load_ising_tests(ks=[10, 100, 1000, 10000, 100000], sample_size=20)
     run_tests(tests_ising, binary_err=True)
     plot_tests(tests_ising, 'icml17-ising')
+
+def run_random():
+    tests_random = load_random_tests(ks=[10, 100, 1000, 10000, 100000], sample_size=100)
+    # tests_random = load_random_tests(ks=[10, 100, 1000], ns=[10, 15], sample_size=2)
+    run_tests(tests_random, binary_err=True)
+    plot_tests(tests_random, 'icml17-random')
 
 def run_uai():
     tests_uai_2 = load_uai_tests(['linkage_*.uai', 'Promedus_*.uai'], r=2, ks=[10, 100, 1000, 10000])
@@ -227,6 +278,6 @@ def run_all():
     run_uai()
 
 if __name__ == '__main__':
-    run_ising()
+    run_random()
 
 

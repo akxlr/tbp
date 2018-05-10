@@ -10,6 +10,7 @@ build/
 
 tests/uai/MAR_prob/*.dfg
 tests/plots
+plots/
 libdai/Makefile.conf
 libdai/lib/libdai.a
 libdai/utils/createfg
