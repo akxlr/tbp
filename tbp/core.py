@@ -475,7 +475,7 @@ class DecomposedGraph(Graph):
         by sampling, and then marginalise once.
         :return: Marginals as list of lists.
         """
-        p = subprocess.run([TBP_BINARY, str(k)], stdout=subprocess.PIPE,
+        p = subprocess.run([TBP_BINARY, str(k), '--mult-all'], stdout=subprocess.PIPE,
                            input=str(self), encoding='ascii')
         assert p.returncode == 0
 

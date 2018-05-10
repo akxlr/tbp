@@ -259,13 +259,13 @@ def load_random_tests(ks, sample_size=100) -> List[Tuple]:
 def run_ising():
     tests_ising = load_ising_tests(ks=[10, 100, 1000, 10000, 100000], sample_size=20)
     run_tests(tests_ising, binary_err=True)
-    plot_tests(tests_ising, 'icml17-ising')
+    plot_tests(tests_ising, 'icml17-ising-multall')
 
 def run_random():
     tests_random = load_random_tests(ks=[10, 100, 1000, 10000, 100000], sample_size=100)
     # tests_random = load_random_tests(ks=[10, 100, 1000], ns=[10, 15], sample_size=2)
     run_tests(tests_random, binary_err=True)
-    plot_tests(tests_random, 'icml17-random')
+    plot_tests(tests_random, 'icml17-random-multall')
 
 def run_uai():
     tests_uai_2 = load_uai_tests(['linkage_*.uai', 'Promedus_*.uai'], r=2, ks=[10, 100, 1000, 10000])
@@ -278,6 +278,7 @@ def run_all():
     run_uai()
 
 if __name__ == '__main__':
+    run_ising()
     run_random()
 
 
