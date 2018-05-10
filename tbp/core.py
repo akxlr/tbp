@@ -472,6 +472,7 @@ class DecomposedGraph(Graph):
         """
         Call libdai/utils/dfgmarg binary via pipe to get approximate marginals.
         :param k: TBP sample size
+        by sampling, and then marginalise once.
         :return: Marginals as list of lists.
         """
         p = subprocess.run([TBP_BINARY, str(k)], stdout=subprocess.PIPE,
@@ -804,13 +805,49 @@ def ising_g(N, unary_min, unary_max, pairwise_min, pairwise_max):
     return Graph(g), DecomposedGraph(dg)
 
 
+def random_g(N, edge_prob, unary_min, unary_max, pairwise_min, pairwise_max):
+    """
+    Connected N-variable MRF with Ising potentials uniformly chosen within the given limits. Each possible edge is
+    present with independent probability edge_prob.
+    :return: Tuple (g, dg) containing the MRF as a Graph and DecomposedGraph instance respectively. The tensor
+    decomposition used is described in Wrigley, Lee and Ye (2017), supplementary material.
+    """
+    g = []
+    dg = []
+    while not g or len(Graph(g).get_connected_components()) > 1:
+        for i in range(N):
+
+            # Unary potential
+            theta = np.random.uniform(unary_min, unary_max)
+            g.append(Factor([i], np.exp([theta, -theta])))
+            dg.append(DecomposedFactor([i], np.array([1.0]), [np.exp([[theta], [-theta]])]))
+
+            for j in range(i + 1, N):
+
+                if np.random.rand() < edge_prob:
+
+                    # Pairwise potential
+                    theta = np.random.uniform(pairwise_min, pairwise_max)
+                    f = Factor([i, j], np.exp([[theta, -theta], [-theta, theta]]))
+                    G, H = factorise_ising(np.exp(theta))
+                    df = DecomposedFactor([i, j], np.array([1.0, 1.0]), [G, H])
+
+                    # Check decomposed potential is equal to original
+                    assert df.expand() == f
+
+                    g.append(f)
+                    dg.append(df)
+
+    return Graph(g), DecomposedGraph(dg)
+
+
 def l1_error(marg_1, marg_2, binary=False):
     """
     Mean L1 marginal error.
     :param marg_1: List of lists containing marginals
     :param marg_2: List of lists containing marginals
     :param binary: Set to true if computing errors for binary variables to return the average error in P(X=0), ignoring
-    P(X=1).
+    P(X=1) (no difference to result, just slightly more efficient).
     :return: Mean error over all marginals.
     """
 
@@ -825,9 +862,10 @@ def l1_error(marg_1, marg_2, binary=False):
         if binary:
             assert len(marg_1[i]) == 2
             err += np.abs(marg_1[i][0] - marg_2[i][0])
+            n += 1
         else:
             err += np.sum([np.abs(marg_1[i][j] - marg_2[i][j]) for j in range(len(marg_1[i]))])
-        n += len(marg_1[i])
+            n += len(marg_1[i])
     return err / n
 
 
@@ -843,16 +881,5 @@ def format_mar(marg):
     return ' '.join(str(x) for x in fields)
 
 
-def run_tests(tests, ks, binary_err=False):
-
-    for i, (name, g, dg, true_marg) in enumerate(tests):
-        print("Running test '{}' ({} of {})".format(name, i + 1, len(tests)))
-        components = g.show_stats()
-        print("Results:")
-        for k in ks:
-            marg_est = dg.tbp_marg(k)
-            err = l1_error(marg_est, true_marg, binary_err)
-            print("  (k={}) Mean L1 error: {}".format(k, err))
-        print("")
 
 
