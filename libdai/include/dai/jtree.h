@@ -28,7 +28,6 @@
 #include <dai/weightedgraph.h>
 #include <dai/enum.h>
 #include <dai/properties.h>
-#include <Eigen/Dense>
 
 
 namespace dai {
@@ -60,8 +59,6 @@ class JTree : public DAIAlgRG {
 
         /// Inner region beliefs
         std::vector<Factor> Qb;
-
-        Factor full_prod;
 
         /// Parameters for JTree
         struct Properties {
@@ -111,7 +108,7 @@ class JTree : public DAIAlgRG {
     /// \name Constructors/destructors
     //@{
         /// Default constructor
-        JTree() : DAIAlgRG(), _mes(), _logZ(), RTree(), Qa(), Qb(), full_prod(), props() {}
+        JTree() : DAIAlgRG(), _mes(), _logZ(), RTree(), Qa(), Qb(), props() {}
 
         /// Construct from FactorGraph \a fg and PropertySet \a opts
         /** \param fg factor graph
@@ -129,9 +126,6 @@ class JTree : public DAIAlgRG {
         virtual std::string name() const { return "JTREE"; }
         virtual Factor belief( const VarSet &vs ) const;
         virtual std::vector<Factor> beliefs() const;
-
-        virtual std::vector<Eigen::VectorXd> full_prod_all_beliefs();
-
         virtual Real logZ() const;
         /** \pre Assumes that run() has been called and that \a props.inference == \c MAXPROD
          */

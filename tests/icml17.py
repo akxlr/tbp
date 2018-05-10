@@ -46,6 +46,9 @@ def save_plot(results, name):
     :return:
     """
 
+    if not os.path.exists('plots'):
+        os.makedirs('plots')
+
     # # Add padding so we can see the markers
     # xticks, xticklabels = plt.xticks()
     # xmin = (3 * xticks[0] - xticks[1]) / 2.
@@ -208,36 +211,61 @@ def load_ising_tests(ks, sample_size=100) -> List[Tuple]:
     return tests
 
 
+def load_random_tests(ks, sample_size=100) -> List[Tuple]:
+    """
+    Load the random MRF tests used to produce Wrigley, Lee and Ye (2017), Figure 2.
+    """
+
+    unary_str = 1
+    pairwise_str = 2
+    edge_prob = 0.5
+    N = 15
+    tests = []
+
+    # First two tests - varying k
+    for i in range(sample_size):
+        test_name = 'random_k_{}_mixed_{}'.format(N, i)
+        print("Generating test case {}".format(test_name))
+        g, dg = tbp.random_g(N, edge_prob, -unary_str, unary_str, -pairwise_str, pairwise_str)
+        true_marg = g.exact_marg_elim()
+        tests.append({
+            'name': test_name,
+            'g': g,
+            'dg': dg,
+            'ks': ks,
+            'plot_series': 'mixed',
+            'true_marg': true_marg,
+        })
+
+    for i in range(sample_size):
+        test_name = 'random_k_{}_attractive_{}'.format(N, i)
+        print("Generating test case {}".format(test_name))
+        g, dg = tbp.random_g(N, edge_prob, -unary_str, unary_str, 0, pairwise_str)
+        true_marg = g.exact_marg_elim()
+        tests.append({
+            'name': test_name,
+            'g': g,
+            'dg': dg,
+            'ks': ks,
+            'plot_series': 'attractive',
+            'true_marg': true_marg,
+        })
+
+    # TODO Second two tests - varying N
+
+
+    return tests
+
 def run_ising():
-   # tests_ising = load_fig1_tests(ks=[10, 100, 1000, 10000, 100000], sample_size=20)
-    tests_ising_mult = load_ising_tests(ks=[10, 100, 1000, 10000, 100000], sample_size=20)
-    # tests_ising = load_fig1_tests(ks=[10, 100], sample_size=2)
-    # tests_ising_mult = load_fig1_tests(ks=[10, 100], sample_size=2)
+    tests_ising = load_ising_tests(ks=[10, 100, 1000, 10000, 100000], sample_size=20)
+    run_tests(tests_ising, binary_err=True)
+    plot_tests(tests_ising, 'icml17-ising')
 
-    # run_tests(tests_ising, binary_err=True)
-    run_tests(tests_ising_mult, binary_err=True, marg_params={'naive_mult': True})
-
-    plot_tests(tests_ising_mult, 'icml17-jtree-mult-all')
-
-    # mixed = []
-    # attractive = []
-    # for test in tests_ising:
-    #     if test['plot_series'] == 'mixed':
-    #         test['plot_series'] = 'tbp'
-    #         mixed.append(test)
-    #     elif test['plot_series'] == 'attractive':
-    #         test['plot_series'] = 'tbp'
-    #         attractive.append(test)
-    # for test in tests_ising_mult:
-    #     if test['plot_series'] == 'mixed':
-    #         test['plot_series'] = 'tbp_mult_all_linear'
-    #         mixed.append(test)
-    #     elif test['plot_series'] == 'attractive':
-    #         test['plot_series'] = 'tbp_mult_all_linear'
-    #         attractive.append(test)
-
-    # plot_tests(mixed, 'icml17-ising-mixed')
-    # plot_tests(attractive, 'icml17-ising-attractive')
+def run_random():
+    tests_random = load_random_tests(ks=[10, 100, 1000, 10000, 100000], sample_size=100)
+    # tests_random = load_random_tests(ks=[10, 100, 1000], ns=[10, 15], sample_size=2)
+    run_tests(tests_random, binary_err=True)
+    plot_tests(tests_random, 'icml17-random')
 
 def run_uai():
     tests_uai_2 = load_uai_tests(['linkage_*.uai', 'Promedus_*.uai'], r=2, ks=[10, 100, 1000, 10000])
@@ -248,5 +276,8 @@ def run_uai():
 def run_all():
     run_ising()
     run_uai()
+
+if __name__ == '__main__':
+    run_random()
 
 

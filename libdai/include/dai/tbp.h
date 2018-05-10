@@ -10,7 +10,6 @@
 namespace dai {
 
     std::vector<Eigen::VectorXd> tbp_marg(std::vector<DFactor> factors, int k);
-    std::vector<Eigen::VectorXd> tbp_marg_naive(std::vector<DFactor> factors, int k);
     std::vector<dai::DFactor> read_dfg_from_stream(std::istream& is);
 
 }

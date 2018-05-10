@@ -20,11 +20,10 @@ void show_usage() {
     cout << "Get approximate marginals for a decomposed factor graph using TBP" << endl;
     cout << "(see https://github.com/akxlr/tbp)." << endl << endl;
     cout << "Usage:" << endl;
-    cout << "./dfgmarg graph.dfg K [--mult-all]" << endl;
-    cout << "    Run TBP on graph.dfg with sample size K." << endl;
-    cout << "cat file.dfg | dfgmarg K [--multi-all]" << endl;
+    cout << "./dfgmarg graph.dfg K" << endl;
+    cout << "    Run TBP on graph.dfg with sample size K" << endl;
+    cout << "cat file.dfg | dfgmarg K" << endl;
     cout << "    Read graph from stdin and run TBP with sample size K" << endl;
-    cout << "--mult-all: instead of running junction tree algorithm, simply multiply all factors together once and then marginalise, ignoring the graph structure." << endl;
 }
 
 bool is_int(char *str) {
@@ -39,14 +38,6 @@ int main( int argc, char *argv[] ) {
     istream *in;
     ifstream ifn;
     int K;
-    bool mult_all;
-
-    if ( strcmp(argv[argc-1], "--mult-all") == 0 ) {
-        mult_all = true;
-        argc--;
-    } else {
-        mult_all = false;
-    }
 
     if ( argc == 3 ) {
         // An input file has been passed in the command line, read from this
@@ -74,12 +65,7 @@ int main( int argc, char *argv[] ) {
 
     // Get marginals
     vector<DFactor> dfg = read_dfg_from_stream( *in );
-    vector<Eigen::VectorXd> marg;
-    if ( mult_all ) {
-        marg = tbp_marg_naive(dfg, K);
-    } else {
-        marg = tbp_marg(dfg, K);
-    }
+    vector<Eigen::VectorXd> marg = tbp_marg(dfg, K);
 
     // Output in .MAR format
     cout << marg.size();
