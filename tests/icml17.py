@@ -278,6 +278,7 @@ def run_all():
     run_uai()
 
 if __name__ == '__main__':
+    run_ising()
     run_random()
 
 
