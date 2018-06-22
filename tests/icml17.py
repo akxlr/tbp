@@ -263,8 +263,8 @@ def load_random_tests(ks, sample_size=100) -> List[Tuple]:
     return tests
 
 def run_ising():
-    # tests_ising = load_ising_tests(ks=[10, 100, 1000, 10000, 100000], sample_size=20)
-    tests_ising = load_ising_tests(ks=[10, 100, 1000], sample_size=2)
+    tests_ising = load_ising_tests(ks=[10, 100, 1000, 10000, 100000], sample_size=100)
+    # tests_ising = load_ising_tests(ks=[10, 100, 1000], sample_size=2)
     run_tests(tests_ising, binary_err=True)
     plot_tests(tests_ising, 'icml17-ising-multall')
 

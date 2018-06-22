@@ -59,7 +59,9 @@ namespace dai {
         PropertySet opts;
         opts.set("verbose",(size_t)0);       // Verbosity (amount of output generated)
 
-        JTree jt(fg, opts("updates",string("SHSH")));
+        string heuristic = "MINFILL";
+        cerr << "Using elimintation heuristic: " << heuristic << endl;
+        JTree jt(fg, opts("updates",string("SHSH"))("heuristic", heuristic));
 
         jt.init();
         jt.run();
