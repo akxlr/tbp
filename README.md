@@ -11,7 +11,7 @@ each variable.
 ## Requirements
 
  * Linux or OSX
- * Python 3 (tested with 3.6)
+ * Python 3.6+
  
 ## Installation
 
