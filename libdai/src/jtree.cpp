@@ -91,6 +91,9 @@ JTree::JTree( const FactorGraph &fg, const PropertySet &opts, bool automatic ) :
             case Properties::HeuristicType::WEIGHTEDMINFILL:
                 ec = eliminationCost_WeightedMinFill;
                 break;
+            case Properties::HeuristicType::RANDOM:
+                ec = eliminationCost_Random;
+                break;
             default:
                 DAI_THROW(UNKNOWN_ENUM_VALUE);
         }

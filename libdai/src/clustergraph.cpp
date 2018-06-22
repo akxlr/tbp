@@ -135,5 +135,9 @@ size_t eliminationCost_WeightedMinFill( const ClusterGraph &cl, size_t i ) {
     return cost;
 }
 
+size_t eliminationCost_Random( const ClusterGraph &cl, size_t i ) {
+    return rand() % SIZE_MAX;
+}
+
 
 } // end of namespace dai

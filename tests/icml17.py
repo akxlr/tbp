@@ -42,7 +42,7 @@ def run_tests(tests, marg_params=None, binary_err=False):
 
 def save_plot(results, name):
     """
-    :param results: Dict prepared for plotting in the form {series_label ->
+    :param results: Dict prepared for plotting in the form {series_label -> {k -> err}}
     :return:
     """
 
@@ -103,12 +103,18 @@ def plot_tests(tests, name):
     save_plot(results, name)
 
 
-def plot_from_files(*files):
+def plot_from_files(series, out_name):
+    """
+    Combine a set of sourcedata_XXX.json files into a single plot.
+    :param series: List of series, each a tuple of the form (filename, series_name, new_series_name).
+    """
     results = {}
-    for filename in files:
+    for (filename, series_name, new_series_name) in series:
+        if not filename.startswith('plots/'):
+            filename = 'plots/' + filename
         with open(filename, 'r') as f:
-            results.update(json.loads(f.read()))
-    save_plot(results)
+            results[new_series_name] = {int(k): err for k, err in json.loads(f.read())[series_name].items()}
+    save_plot(results, out_name)
 
 
 def load_uai_tests(globs, r, ks, force=False) -> List[Tuple]:
@@ -257,7 +263,8 @@ def load_random_tests(ks, sample_size=100) -> List[Tuple]:
     return tests
 
 def run_ising():
-    tests_ising = load_ising_tests(ks=[10, 100, 1000, 10000, 100000], sample_size=20)
+    # tests_ising = load_ising_tests(ks=[10, 100, 1000, 10000, 100000], sample_size=20)
+    tests_ising = load_ising_tests(ks=[10, 100, 1000], sample_size=2)
     run_tests(tests_ising, binary_err=True)
     plot_tests(tests_ising, 'icml17-ising')
 
@@ -279,6 +286,10 @@ def run_all():
 
 if __name__ == '__main__':
     run_ising()
-    run_random()
+    # run_random()
+    # plot_from_files([
+    #     ('sourcedata_1529645119.462708.json', 'mixed', 'ising-marg-rand'),
+    #     ('sourcedata_1529645371.379286.json', 'mixed', 'ising-marg-minfill'),
+    # ], 'mixed')
 
 
