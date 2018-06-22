@@ -84,9 +84,10 @@ class JTree : public DAIAlgRG {
              *  - WEIGHTEDMINFILL the sum of weights of the edges that need to be added to the adjacency graph
              *    due to the elimination, where a weight of an edge is the produt of weights of its constituent
              *    vertices.
+             *  - RANDOM added for TBP for comparison.
              *  The elimination sequence is chosen greedily in order to minimize the cost.
              */
-            DAI_ENUM(HeuristicType,MINNEIGHBORS,MINWEIGHT,MINFILL,WEIGHTEDMINFILL);
+            DAI_ENUM(HeuristicType,MINNEIGHBORS,MINWEIGHT,MINFILL,WEIGHTEDMINFILL,RANDOM);
 
             /// Verbosity (amount of output sent to stderr)
             size_t verbose;

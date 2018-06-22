@@ -338,6 +338,8 @@ namespace dai {
      */
     size_t eliminationCost_WeightedMinFill( const ClusterGraph& cl, size_t i );
 
+    size_t eliminationCost_Random( const ClusterGraph& cl, size_t i );
+
 
 } // end of namespace dai
 
