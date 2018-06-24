@@ -288,8 +288,8 @@ if __name__ == '__main__':
     run_ising()
     # run_random()
     # plot_from_files([
-    #     ('sourcedata_1529645119.462708.json', 'mixed', 'ising-marg-rand'),
-    #     ('sourcedata_1529645371.379286.json', 'mixed', 'ising-marg-minfill'),
+    #     ('sourcedata_1529653893.930775.json', 'attractive', 'ising-nomarg-minfill'),
+    #     ('sourcedata_1529804161.129529.json', 'attractive', 'ising-nomarg-random'),
     # ], 'mixed')
 
 
