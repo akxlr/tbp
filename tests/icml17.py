@@ -289,7 +289,6 @@ if __name__ == '__main__':
     # run_random()
     # plot_from_files([
     #     ('sourcedata_1529653893.930775.json', 'attractive', 'ising-nomarg-minfill'),
-    #     ('sourcedata_1529804161.129529.json', 'attractive', 'ising-nomarg-random'),
     # ], 'mixed')
 
 

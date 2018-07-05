@@ -9,7 +9,7 @@ build/
 .cache
 
 tests/uai/MAR_prob/*.dfg
-tests/plots
+tests/plots/
 plots/
 libdai/Makefile.conf
 libdai/lib/libdai.a
