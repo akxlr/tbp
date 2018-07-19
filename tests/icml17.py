@@ -67,7 +67,7 @@ def save_plot(results, name):
         ks = sorted(results[series_label].keys())
         plt.plot(ks, [results[series_label][k] for k in ks], label=series_label)
 
-    plt.legend(loc='best', ncol=3)
+    plt.legend(loc='best')
     file_id = time.time()
     plot_filename = "plots/%s-%s.png" % (name, file_id)
     plt.savefig(plot_filename)
@@ -285,10 +285,13 @@ def run_all():
     run_uai()
 
 if __name__ == '__main__':
-    run_ising()
+    # run_ising()
     # run_random()
-    # plot_from_files([
-    #     ('sourcedata_1529653893.930775.json', 'attractive', 'ising-nomarg-minfill'),
-    # ], 'mixed')
+    plot_from_files([
+        ('sourcedata_1529879958.885607.json', 'mixed', 'ising-marg-rand'),
+        ('sourcedata_1529829179.731084.json', 'mixed', 'ising-marg-minfill'),
+        ('sourcedata_1529804161.129529.json', 'mixed', 'ising-nomarg-rand'),
+        ('sourcedata_1529653893.930775.json', 'mixed', 'ising-nomarg-minfill'),
+    ], 'mixed')
 
 
