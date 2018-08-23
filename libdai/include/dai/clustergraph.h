@@ -42,11 +42,14 @@ namespace dai {
             /// Stores the clusters corresponding to the hyperedges
             std::vector<VarSet>  _clusters;
 
+            /// Stores the approximate weight sum of each cluster (necessary for TBPMINWEIGHT elimination heuristic)
+            std::vector<double>  _clusterWeights;
+
         public:
         /// \name Constructors and destructors
         //@{
             /// Default constructor
-            ClusterGraph() : _G(), _vars(), _clusters() {}
+            ClusterGraph() : _G(), _vars(), _clusters(), _clusterWeights() {}
 
             /// Construct from vector of VarSet 's
             ClusterGraph( const std::vector<VarSet>& cls );
@@ -69,10 +72,19 @@ namespace dai {
             /// Returns a constant reference to the variables
             const std::vector<Var>& vars() const { return _vars; }
 
+            /// Returns a constant reference to the cluster weights
+            const std::vector<double>& clusterWeights() const { return _clusterWeights; }
+
             /// Returns a constant reference to the \a i'th variable
             const Var& var( size_t i ) const {
                 DAI_DEBASSERT( i < nrVars() );
                 return _vars[i]; 
+            }
+
+            /// Returns a constant reference to the \a I'th cluster weight
+            const double& clusterWeight( size_t I ) const {
+                DAI_DEBASSERT( I < nrClusters() );
+                return _clusterWeights[I];
             }
 
             /// Returns number of clusters
@@ -102,6 +114,14 @@ namespace dai {
                 VarSet result;
                 bforeach( const Neighbor& I, _G.nb1(i) )
                     result |= _clusters[I];
+                return result;
+            }
+
+            /// Returns cluster weight of Delta(i), i.e. product of cluster weights of all clusters that contain variable i
+            double DeltaWeight( size_t i ) const {
+                double result = 1.;
+                bforeach( const Neighbor& I, _G.nb1(i) )
+                    result *= _clusterWeights[I];
                 return result;
             }
 
@@ -148,10 +168,11 @@ namespace dai {
             /** \note This function could be better optimized if the index of one variable in \a cl would be known.
              *        If one could assume _vars to be ordered, a binary search could be used instead of a linear one.
              */
-            size_t insert( const VarSet& cl ) {
+            size_t insert( const VarSet& cl, double clWeight = 0) {
                 size_t index = findCluster( cl );  // OPTIMIZE ME
                 if( index == _clusters.size() ) {
                     _clusters.push_back( cl );
+                    _clusterWeights.push_back( clWeight );
                     // add variables (if necessary) and calculate neighborhood of new cluster
                     std::vector<size_t> nbs;
                     for( VarSet::const_iterator n = cl.begin(); n != cl.end(); n++ ) {
@@ -172,6 +193,7 @@ namespace dai {
                 for( size_t I = 0; I < _G.nrNodes2(); ) {
                     if( !isMaximal(I) ) {
                         _clusters.erase( _clusters.begin() + I );
+                        _clusterWeights.erase( _clusterWeights.begin() + I );
                         _G.eraseNode2(I);
                     } else
                         I++;
@@ -184,6 +206,7 @@ namespace dai {
                 DAI_ASSERT( i < nrVars() );
                 while( _G.nb1(i).size() ) {
                     _clusters.erase( _clusters.begin() + _G.nb1(i)[0] );
+                    _clusterWeights.erase( _clusterWeights.begin() + _G.nb1(i)[0] );
                     _G.eraseNode2( _G.nb1(i)[0] );
                 }
                 return *this;
@@ -195,7 +218,8 @@ namespace dai {
             VarSet elimVar( size_t i ) {
                 DAI_ASSERT( i < nrVars() );
                 VarSet Di = Delta( i );
-                insert( Di / var(i) );
+                double DiWeight = DeltaWeight( i );
+                insert( Di / var(i), DiWeight );
                 eraseSubsuming( i );
                 eraseNonMaximal();
                 return Di;
@@ -245,6 +269,8 @@ namespace dai {
                 while( !varindices.empty() ) {
                     size_t i = f( cl, varindices );
                     VarSet Di = cl.elimVar( i );
+                    // We don't bother supplying the optional clusterWeight argument here, since result just stores the
+                    // elimination cliques (the weights shouldn't be used for anything)
                     result.insert( Di );
                     if( maxStates ) {
                         totalStates += Di.nrStates();
@@ -286,7 +312,7 @@ namespace dai {
     class greedyVariableElimination {
         public:
             /// Type of cost functions to be used for greedy variable elimination
-            typedef size_t (*eliminationCostFunction)(const ClusterGraph &, size_t);
+            typedef double (*eliminationCostFunction)(const ClusterGraph &, size_t);
 
         private:
             /// Pointer to the cost function used
@@ -310,7 +336,7 @@ namespace dai {
      *  where the adjacency graph has the variables as its nodes and connects
      *  nodes \a i1 and \a i2 iff \a i1 and \a i2 occur together in some common cluster.
      */
-    size_t eliminationCost_MinNeighbors( const ClusterGraph& cl, size_t i );
+    double eliminationCost_MinNeighbors( const ClusterGraph& cl, size_t i );
 
 
     /// Calculates cost of eliminating the \a i 'th variable from cluster graph \a cl according to the "MinWeight" criterion.
@@ -319,7 +345,7 @@ namespace dai {
      *  nodes \a i1 and \a i2 iff \a i1 and \a i2 occur together in some common cluster.
      *  The weight of a node is the number of states of the corresponding variable.
      */
-    size_t eliminationCost_MinWeight( const ClusterGraph& cl, size_t i );
+    double eliminationCost_MinWeight( const ClusterGraph& cl, size_t i );
 
 
     /// Calculates cost of eliminating the \a i 'th variable from cluster graph \a cl according to the "MinFill" criterion.
@@ -327,7 +353,7 @@ namespace dai {
      *  where the adjacency graph has the variables as its nodes and connects
      *  nodes \a i1 and \a i2 iff \a i1 and \a i2 occur together in some common cluster.
      */
-    size_t eliminationCost_MinFill( const ClusterGraph& cl, size_t i );
+    double eliminationCost_MinFill( const ClusterGraph& cl, size_t i );
 
 
     /// Calculates cost of eliminating the \a i 'th variable from cluster graph \a cl according to the "WeightedMinFill" criterion.
@@ -336,9 +362,11 @@ namespace dai {
      *  nodes \a i1 and \a i2 iff \a i1 and \a i2 occur together in some common cluster.
      *  The weight of an edge is the product of the number of states of the variables corresponding with its nodes.
      */
-    size_t eliminationCost_WeightedMinFill( const ClusterGraph& cl, size_t i );
+    double eliminationCost_WeightedMinFill( const ClusterGraph& cl, size_t i );
 
-    size_t eliminationCost_Random( const ClusterGraph& cl, size_t i );
+    double eliminationCost_TbpMinWeight( const ClusterGraph& cl, size_t i );
+    double eliminationCost_MaxCommonVars( const ClusterGraph& cl, size_t i );
+    double eliminationCost_Random( const ClusterGraph& cl, size_t i );
 
 
 } // end of namespace dai

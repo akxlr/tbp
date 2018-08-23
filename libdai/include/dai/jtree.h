@@ -82,12 +82,19 @@ class JTree : public DAIAlgRG {
              *  - MINWEIGHT the product of the number of states of all neighbors in the current adjacency graph;
              *  - MINFILL the number of edges that need to be added to the adjacency graph due to the elimination;
              *  - WEIGHTEDMINFILL the sum of weights of the edges that need to be added to the adjacency graph
-             *    due to the elimination, where a weight of an edge is the produt of weights of its constituent
+             *    due to the elimination, where a weight of an edge is the product of weights of its constituent
              *    vertices.
-             *  - RANDOM added for TBP for comparison.
+             *  - TBPMINWEIGHT (TBP) product of factor weights of all factors containing the variable, where factor
+             *    weight is the sum of the term weights w_i in the decomposed representation of the factor. Idea is to
+             *    minimise the weight sum of the new factor that is created when eliminating the variable.
+             *  - MAXCOMMONVARS (negative of) size of intersection of scope of all factors containing the variable,
+             *    i.e. choose the variable that results in multiplications with the most common factors. Idea is that
+             *    multiplying factors with more common variables leads to lower weight sum in the resulting new factor,
+             *    after reweighting.
+             *  - RANDOM random elimination order for comparison.
              *  The elimination sequence is chosen greedily in order to minimize the cost.
              */
-            DAI_ENUM(HeuristicType,MINNEIGHBORS,MINWEIGHT,MINFILL,WEIGHTEDMINFILL,RANDOM);
+            DAI_ENUM(HeuristicType,MINNEIGHBORS,MINWEIGHT,MINFILL,WEIGHTEDMINFILL,TBPMINWEIGHT,MAXCOMMONVARS,RANDOM);
 
             /// Verbosity (amount of output sent to stderr)
             size_t verbose;

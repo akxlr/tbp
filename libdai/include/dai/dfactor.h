@@ -368,6 +368,10 @@ class DFactor {
 
         TFactor<Real> asTFactor() const;
 
+        double weightSum() const {
+            return weights.sum();
+        };
+
     //@}
 };
 

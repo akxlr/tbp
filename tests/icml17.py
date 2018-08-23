@@ -286,12 +286,11 @@ def run_all():
 
 if __name__ == '__main__':
     run_ising()
-    # run_random()
-    plot_from_files([
-        ('sourcedata_1529879958.885607.json', 'mixed', 'ising-marg-rand'),
-        ('sourcedata_1529829179.731084.json', 'mixed', 'ising-marg-minfill'),
-        ('sourcedata_1529804161.129529.json', 'mixed', 'ising-nomarg-rand'),
-        ('sourcedata_1529653893.930775.json', 'mixed', 'ising-nomarg-minfill'),
-    ], 'mixed')
+    # plot_from_files([
+    #     ('sourcedata_1529879958.885607.json', 'mixed', 'ising-marg-rand'),
+    #     ('sourcedata_1529829179.731084.json', 'mixed', 'ising-marg-minfill'),
+    #     ('sourcedata_1529804161.129529.json', 'mixed', 'ising-nomarg-rand'),
+    #     ('sourcedata_1529653893.930775.json', 'mixed', 'ising-nomarg-minfill'),
+    # ], 'mixed')
 
 
