@@ -8,6 +8,8 @@ Author: Andrew Wrigley, National University of Singapore and Australian National
 
 import os
 import sys
+import numpy as np
+import multiprocessing as mp
 from . import core
 from .core import status
 import argparse
@@ -22,14 +24,28 @@ class HelpfulParser(argparse.ArgumentParser):
         sys.stderr.write('\nerror: {}\n'.format(message))
         sys.exit(2)
 
+def _avg_marg(marginals):
+    return np.array(marginals).mean(axis=0).tolist()
 
-def _marg(in_file, r=None, K=None, evid_file=None, out_file=None, exact=False, verbosity=None):
+def _parallel_marg(dg, K, n_run, processes):
+    pool = mp.Pool(processes=processes)
+    results = [pool.apply_async(dg.tbp_marg, args=(K,)) for x in range(n_run)]
+    marginals = [p.get() for p in results]
+    return _avg_marg(marginals)
+
+def _marg(in_file, r=None, K=None, evid_file=None, out_file=None, exact=False, n_run=1, processes=1, verbosity=None):
 
     if r is not None:
         r = int(r)
 
     if K is not None:
         K = int(K)
+
+    if n_run is not None:
+        n_run = int(n_run)
+
+    if processes is not None:
+        processes = int(processes)
 
     if verbosity:
         core.verbosity = int(verbosity)
@@ -81,8 +97,8 @@ def _marg(in_file, r=None, K=None, evid_file=None, out_file=None, exact=False, v
         mar = g.exact_marg_elim()
 
     else:
-        status("Running TBP with sample size K={}...".format(K), 2)
-        mar = dg.tbp_marg(K)
+        status("Running TBP with sample size K={}, n_run={}, processes={}...".format(K, n_run, processes), 2)
+        mar = _parallel_marg(dg, K, n_run, processes)
 
     if out_extn == '.MAR':
         with open(out_file, 'w') as f:
@@ -122,6 +138,25 @@ def main():
         default=core.DEFAULT_COMPONENTS,
     )
 
+
+    parser.add_argument(
+        '-n',
+        '--n_run',
+        required=False,
+        help="Number of repeated runs (default: {})".format(core.DEFAULT_RUNS),
+        default=core.DEFAULT_RUNS,
+    )
+
+
+    parser.add_argument(
+        '-p',
+        '--processes',
+        required=False,
+        help="Number of processes for repeated runs (default: {})".format(core.PROCESSES),
+        default=core.PROCESSES,
+    )
+
+
     parser.add_argument(
         '-k',
         '--sample-size',
@@ -155,7 +190,8 @@ def main():
 
     args = vars(parser.parse_args())
     _marg(in_file=args['in_file'], r=args['rank'], K=args['sample_size'], evid_file=args['evidence'],
-          out_file=args['output'], exact=args['exact'], verbosity=args['verbosity'])
+          out_file=args['output'], exact=args['exact'], n_run=args['n_run'], processes=args['processes'], 
+          verbosity=args['verbosity'])
 
 
 

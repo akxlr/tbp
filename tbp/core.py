@@ -25,6 +25,9 @@ DEFAULT_SAMPLE_SIZE = 10000
 DBL_MIN = 2.22507e-307
 DBL_MAX = 1.79769e+307
 
+DEFAULT_RUNS = 1
+PROCESSES = 1
+
 verbosity = 1
 
 # By default, tensor decomposition uses tensorly library. Alternatively, the MATLAB Tensor Toolbox by Kolda et al can
