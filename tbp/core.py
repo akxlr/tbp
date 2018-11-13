@@ -12,6 +12,7 @@ from operator import mul
 from typing import List
 import numpy as np
 from numpy.linalg import LinAlgError
+import multiprocessing as mp
 
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 TBP_BINARY = os.path.join(BASE_DIR, 'dfgmarg')
@@ -26,7 +27,7 @@ DBL_MIN = 2.22507e-307
 DBL_MAX = 1.79769e+307
 
 DEFAULT_RUNS = 1
-PROCESSES = 1
+DEFAULT_PROCESSES = 1
 
 verbosity = 1
 
@@ -471,7 +472,14 @@ class DecomposedGraph(Graph):
         with open(filename, 'w') as f:
             f.write(str(self))
 
-    def tbp_marg(self, k=DEFAULT_SAMPLE_SIZE):
+    def tbp_marg(self, k=DEFAULT_SAMPLE_SIZE, n_run=DEFAULT_RUNS, processes=DEFAULT_PROCESSES):
+        pool = mp.Pool(processes=processes)
+        results = [pool.apply_async(self._tbp_marg, args=(k,)) for x in range(n_run)]
+        marginals = [p.get() for p in results]
+        return np.array(marginals).mean(axis=0).tolist()
+
+
+    def _tbp_marg(self, k=DEFAULT_SAMPLE_SIZE):
         """
         Call libdai/utils/dfgmarg binary via pipe to get approximate marginals.
         :param k: TBP sample size

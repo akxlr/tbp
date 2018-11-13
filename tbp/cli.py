@@ -8,8 +8,6 @@ Author: Andrew Wrigley, National University of Singapore and Australian National
 
 import os
 import sys
-import numpy as np
-import multiprocessing as mp
 from . import core
 from .core import status
 import argparse
@@ -23,15 +21,6 @@ class HelpfulParser(argparse.ArgumentParser):
         self.print_help(sys.stderr)
         sys.stderr.write('\nerror: {}\n'.format(message))
         sys.exit(2)
-
-def _avg_marg(marginals):
-    return np.array(marginals).mean(axis=0).tolist()
-
-def _parallel_marg(dg, K, n_run, processes):
-    pool = mp.Pool(processes=processes)
-    results = [pool.apply_async(dg.tbp_marg, args=(K,)) for x in range(n_run)]
-    marginals = [p.get() for p in results]
-    return _avg_marg(marginals)
 
 def _marg(in_file, r=None, K=None, evid_file=None, out_file=None, exact=False, n_run=1, processes=1, verbosity=None):
 
@@ -98,7 +87,7 @@ def _marg(in_file, r=None, K=None, evid_file=None, out_file=None, exact=False, n
 
     else:
         status("Running TBP with sample size K={}, n_run={}, processes={}...".format(K, n_run, processes), 2)
-        mar = _parallel_marg(dg, K, n_run, processes)
+        mar = dg.tbp_marg(K, n_run, processes)
 
     if out_extn == '.MAR':
         with open(out_file, 'w') as f:
@@ -152,8 +141,8 @@ def main():
         '-p',
         '--processes',
         required=False,
-        help="Number of processes for repeated runs (default: {})".format(core.PROCESSES),
-        default=core.PROCESSES,
+        help="Number of processes for repeated runs (default: {})".format(core.DEFAULT_PROCESSES),
+        default=core.DEFAULT_PROCESSES,
     )
 
 
