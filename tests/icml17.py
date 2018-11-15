@@ -285,12 +285,23 @@ def run_all():
     run_uai()
 
 if __name__ == '__main__':
-    run_ising()
+    # run_ising()
     # plot_from_files([
-    #     ('sourcedata_1529879958.885607.json', 'mixed', 'ising-marg-rand'),
-    #     ('sourcedata_1529829179.731084.json', 'mixed', 'ising-marg-minfill'),
     #     ('sourcedata_1529804161.129529.json', 'mixed', 'ising-nomarg-rand'),
     #     ('sourcedata_1529653893.930775.json', 'mixed', 'ising-nomarg-minfill'),
+    #     ('sourcedata_1529879958.885607.json', 'mixed', 'ising-marg-rand'),
+    #     ('sourcedata_1529829179.731084.json', 'mixed', 'ising-marg-minfill'),
+    #     ('sourcedata_1534938422.063753.json', 'mixed', 'ising-marg-tbpminweight'),
+    #     ('sourcedata_1535010083.4780428.json', 'mixed', 'ising-marg-maxcommonvars'),
     # ], 'mixed')
+
+    plot_from_files([
+        ('sourcedata_1529804161.129529.json', 'attractive', 'ising-nomarg-rand'),
+        ('sourcedata_1529653893.930775.json', 'attractive', 'ising-nomarg-minfill'),
+        ('sourcedata_1529879958.885607.json', 'attractive', 'ising-marg-rand'),
+        ('sourcedata_1529829179.731084.json', 'attractive', 'ising-marg-minfill'),
+        ('sourcedata_1534938422.063753.json', 'attractive', 'ising-marg-tbpminweight'),
+        ('sourcedata_1535010083.4780428.json', 'attractive', 'ising-marg-maxcommonvars'),
+    ], 'attractive')
 
 
