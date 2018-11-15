@@ -77,6 +77,7 @@ JTree::JTree( const FactorGraph &fg, const PropertySet &opts, bool automatic ) :
             cerr << "Initial clusters: " << _cg << endl;
 
         // Use heuristic to guess optimal elimination sequence
+
         greedyVariableElimination::eliminationCostFunction ec(NULL);
         switch( (size_t)props.heuristic ) {
             case Properties::HeuristicType::MINNEIGHBORS:
@@ -90,6 +91,12 @@ JTree::JTree( const FactorGraph &fg, const PropertySet &opts, bool automatic ) :
                 break;
             case Properties::HeuristicType::WEIGHTEDMINFILL:
                 ec = eliminationCost_WeightedMinFill;
+                break;
+            case Properties::HeuristicType::TBPMINWEIGHT:
+                ec = eliminationCost_TbpMinWeight;
+                break;
+            case Properties::HeuristicType::MAXCOMMONVARS:
+                ec = eliminationCost_MaxCommonVars;
                 break;
             case Properties::HeuristicType::RANDOM:
                 ec = eliminationCost_Random;
