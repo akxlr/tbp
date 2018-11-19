@@ -763,15 +763,16 @@ def factorise_ising(t):
 
     return [G, H]
 
-def ising_g(N, unary_min, unary_max, pairwise_min, pairwise_max):
+
+def asymmetric_ising_g(M, N, unary_min, unary_max, pairwise_min, pairwise_max):
     """
-    NxN Ising model with random potentials uniformly chosen within the given limits.
+    MxN Ising model with random potentials uniformly chosen within the given limits.
     :return: Tuple (g, dg) containing the ising model as a Graph and DecomposedGraph instance respectively. The
     tensor decomposition used is described in Wrigley, Lee and Ye (2017), supplementary material.
     """
     g = []
     dg = []
-    for var in range(N*N):
+    for var in range(M*N):
         # Unary potential
         theta = np.random.uniform(unary_min, unary_max)
         g.append(Factor([var], np.exp([theta, -theta])))
@@ -803,6 +804,15 @@ def ising_g(N, unary_min, unary_max, pairwise_min, pairwise_max):
             dg.append(df)
 
     return Graph(g), DecomposedGraph(dg)
+
+
+def ising_g(N, unary_min, unary_max, pairwise_min, pairwise_max):
+    """
+    NxN Ising model with random potentials uniformly chosen within the given limits.
+    :return: Tuple (g, dg) containing the ising model as a Graph and DecomposedGraph instance respectively. The
+    tensor decomposition used is described in Wrigley, Lee and Ye (2017), supplementary material.
+    """
+    return asymmetric_ising_g(N, N, unary_min, unary_max, pairwise_min, pairwise_max)
 
 
 def random_g(N, edge_prob, unary_min, unary_max, pairwise_min, pairwise_max):
