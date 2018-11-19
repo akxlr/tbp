@@ -101,11 +101,19 @@ JTree::JTree( const FactorGraph &fg, const PropertySet &opts, bool automatic ) :
             case Properties::HeuristicType::RANDOM:
                 ec = eliminationCost_Random;
                 break;
+            case Properties::HeuristicType::SEQUENTIAL:
+                break;
             default:
                 DAI_THROW(UNKNOWN_ENUM_VALUE);
         }
         size_t fudge = 6; // this yields a rough estimate of the memory needed (for some reason not yet clearly understood)
-        vector<VarSet> ElimVec = _cg.VarElim( greedyVariableElimination( ec ), props.maxmem / (sizeof(Real) * fudge) ).eraseNonMaximal().clusters();
+
+        std::vector<VarSet> ElimVec;
+        if((size_t)props.heuristic == Properties::HeuristicType::SEQUENTIAL)
+            ElimVec = _cg.VarElim( sequentialVariableElimination( fg.vars() ), props.maxmem / (sizeof(Real) * fudge) ).eraseNonMaximal().clusters();
+        else 
+            ElimVec = _cg.VarElim( greedyVariableElimination( ec ), props.maxmem / (sizeof(Real) * fudge) ).eraseNonMaximal().clusters();
+
         if( props.verbose >= 3 )
             cerr << "VarElim result: " << ElimVec << endl;
 
@@ -578,6 +586,28 @@ std::pair<size_t,BigInt> boundTreewidth( const FactorGraph &fg, greedyVariableEl
 
     // Obtain elimination sequence
     vector<VarSet> ElimVec = _cg.VarElim( greedyVariableElimination( fn ), maxStates ).eraseNonMaximal().clusters();
+
+    // Calculate treewidth
+    size_t treewidth = 0;
+    BigInt nrstates = 0.0;
+    for( size_t i = 0; i < ElimVec.size(); i++ ) {
+        if( ElimVec[i].size() > treewidth )
+            treewidth = ElimVec[i].size();
+        BigInt s = ElimVec[i].nrStates();
+        if( s > nrstates )
+            nrstates = s;
+    }
+
+    return make_pair(treewidth, nrstates);
+}
+
+
+std::pair<size_t,BigInt> boundSequentialTreewidth( const FactorGraph &fg, size_t maxStates ) {
+    // Create cluster graph from factor graph
+    ClusterGraph _cg( fg, true );
+
+    // Obtain elimination sequence
+    vector<VarSet> ElimVec = _cg.VarElim( sequentialVariableElimination( fg.vars() ), maxStates ).eraseNonMaximal().clusters();
 
     // Calculate treewidth
     size_t treewidth = 0;

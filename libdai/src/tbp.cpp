@@ -1,5 +1,8 @@
 #include <dai/tbp.h>
 #include <assert.h>
+#include <cstdlib>
+#include <string>
+#include <dai/jtree.h>
 
 namespace dai {
 
@@ -19,12 +22,25 @@ namespace dai {
 
         PropertySet opts;
         opts.set("verbose",(size_t)0);       // Verbosity (amount of output generated)
-
-        string heuristic = "MAXCOMMONVARS";
+        
+        string heuristic;
+        if(const char* env_heuristic = std::getenv("TBP_HEURISTIC"))
+            heuristic = (string)env_heuristic;
+        else
+            heuristic = "MAXCOMMONVARS";
+//        string heuristic = "MAXCOMMONVARS";
 //        string heuristic = "TBPMINWEIGHT";
 //        string heuristic = "MINFILL";
 //        string heuristic = "RANDOM";
         cerr << "Using elimintation heuristic: " << heuristic << endl;
+
+        if(heuristic == "SEQUENTIAL"){
+            size_t maxstates = 0; // unlimited max states
+            std::pair<size_t,BigInt> tw;
+            tw = boundSequentialTreewidth(fg, maxstates );
+            cerr << tw.first << " (" << tw.second << " states)" << endl;
+        }
+
         JTree jt(fg, opts("updates",string("SHSH"))("heuristic", heuristic));
 
         jt.init();
