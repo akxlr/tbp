@@ -94,7 +94,7 @@ class JTree : public DAIAlgRG {
              *  - RANDOM random elimination order for comparison.
              *  The elimination sequence is chosen greedily in order to minimize the cost.
              */
-            DAI_ENUM(HeuristicType,MINNEIGHBORS,MINWEIGHT,MINFILL,WEIGHTEDMINFILL,TBPMINWEIGHT,MAXCOMMONVARS,RANDOM);
+            DAI_ENUM(HeuristicType,MINNEIGHBORS,MINWEIGHT,MINFILL,WEIGHTEDMINFILL,TBPMINWEIGHT,MAXCOMMONVARS,RANDOM,SEQUENTIAL);
 
             /// Verbosity (amount of output sent to stderr)
             size_t verbose;
@@ -216,6 +216,7 @@ class JTree : public DAIAlgRG {
  */
 std::pair<size_t,BigInt> boundTreewidth( const FactorGraph &fg, greedyVariableElimination::eliminationCostFunction fn, size_t maxStates=0 );
 
+std::pair<size_t,BigInt> boundSequentialTreewidth( const FactorGraph &fg, size_t maxStates=0 );
 
 } // end of namespace dai
 
