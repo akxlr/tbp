@@ -122,7 +122,18 @@ class Factor(FactorBase):
         self.table = table
 
     def __str__(self):
-        return "Factor({},\n{})".format(self.vars, self.table)
+        res = '\n'.join([
+            str(self.n_vars),
+            ' '.join(str(x) for x in self.vars),
+            ' '.join(str(x) for x in self.cardinalities),
+        ]) + '\n'
+        # 'F' = column-major order
+        table_flat = self.table.flatten(order='F')
+        nonzero = [(i, safedouble(table_flat[i])) for i in range(len(table_flat)) if table_flat[i]]
+        res += str(len(nonzero)) + '\n'
+        for x in nonzero:
+            res += '{} {}\n'.format(*x)
+        return res
 
     def __repr__(self):
         return self.__str__()

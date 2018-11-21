@@ -6,8 +6,31 @@ import time
 import pickle
 import os
 import glob
+import subprocess
 import pandas as pd
 import numpy as np
+from enum import Enum
+
+DAI_BINARY = "../../libdai/utils/daimarg"
+
+def libdai_marg(g, algo):
+    Algorithm = Enum("Algorithm", "JTree BP MF TWRBP Gibbs")
+    k = Algorithm[algo].value - 1
+    p = subprocess.run([DAI_BINARY, str(k)], stdout=subprocess.PIPE,
+                       input=str(g), encoding='ascii')
+    assert p.returncode == 0
+
+    # Marginals are returned in .MAR format, convert this to list of lists
+    marginals = []
+    tokens = iter(p.stdout.split())
+    n_vars = int(next(tokens))
+    for i in range(n_vars):
+        marginals.append([])
+        cardinality = int(next(tokens))
+        for j in range(cardinality):
+            marginals[-1].append(float(next(tokens)))
+
+    return marginals
 
 
 def transpose_elim_order(M, N, vars_list):
@@ -30,7 +53,12 @@ def sample_ising_models(M, N, interaction, sample_size=100) -> List[Tuple]:
                 params = (M, N) + (-unary_str, unary_str, -pairwise_str, pairwise_str)
             g, dg = tbp.asymmetric_ising_g(*params)
             elim_order = None if M > N else transpose_elim_order(M, N, g.get_vars_list()) # better elimination ordering
-            true_marg = g.exact_marg_elim()
+            if(os.path.exists(DAI_BINARY)):
+                if elim_order:
+                    os.environ["DAI_SEQ_ORDER"] = " ".join([str(x) for x in elim_order])
+                true_marg = libdai_marg(g, "JTree")
+            else:
+                true_marg = g.exact_marg_elim()
             models.append({
                 'name': model_name,
                 'sample_id': i,
@@ -148,7 +176,7 @@ def run_experiments():
         for interaction in interactions:
             t0 = time.time()
             models = sample_ising_models(M, N, interaction, sample_size=sample_size)
-            print(time.time() - t0)
+            print("Time: {}".format(time.time() - t0))
 
             save_models(models, 'ising_{}x{}_{}_{}'.format(M, N, interaction, sample_size))
 
