@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/akxlr/tbp.svg?branch=master)](https://travis-ci.org/akxlr/tbp)
 
 [Tensor Belief Propagation](http://proceedings.mlr.press/v70/wrigley17a/wrigley17a.pdf) (TBP) is an experimental algorithm for
-approximate inference in discrete graphical models [1]. At a high level, it takes a factor graph in [.uai](#other-file-formats) or [.fg](#other-file-formats) format and outputs approximate marginals for
+approximate inference in discrete graphical models [1]. It takes a factor graph in [.uai](#other-file-formats) or [.fg](#other-file-formats) format and outputs approximate marginals for
 each variable.
 
 [1] [Wrigley, Andrew, Wee Sun Lee, and Nan Ye. "Tensor Belief Propagation." International Conference on Machine Learning. 2017.](http://proceedings.mlr.press/v70/wrigley17a/wrigley17a.pdf)
@@ -12,26 +12,35 @@ each variable.
 
  * Linux or OSX
  * Python 3.6+
- 
+
 ## Installation
 
-Install with the Python package manager `pip`:
+Install libDAI prerequisites:
+```
+# Linux
+$ sudo apt-get install g++ make doxygen graphviz libboost-dev libboost-graph-dev libboost-program-options-dev libboost-test-dev libgmp-dev cimg-dev
+
+# OSX
+$ brew install boost gmp doxygen graphviz
+```
+
+Install tbp with the Python package manager `pip`:
 ```bash
 $ pip install tbp
 ...
 Successfully installed tbp-X.X.X
 ```
-This will likely take several minutes as libDAI must be compiled.
+This will take a while as libDAI must be compiled.
 
 ## Usage
 TBP takes a factor graph in either [.fg](#other-file-formats) or [.uai](#other-file-formats) format as input, and
 outputs the approximate marginal distribution of each variable in [.MAR format](#other-file-formats).
 This involves two steps — first, all potential functions in the graph must be decomposed
-into sums of rank-1 tensors rather than multidimensional tables, yielding a decomposed factor graph (.dfg). Then, the
+into sums of rank-1 tensors yielding a decomposed factor graph (.dfg). Then, the
 message passing procedure must be run on the decomposed graph to give approximate marginals.
 
 ### Command line
-After installation, the command line utility `tbp` is available to do either or both of these steps. For full usage
+After installation, the command line utility `tbp` is available to do either or both of these steps. For usage
 instructions, run `tbp --help`. 
 
 #### Examples
@@ -84,19 +93,18 @@ mar = dg.tbp_marg(K=10000)
 
 ### Troubleshooting
 #### Installing into a virtual environment
-If you find `pip install` has issues with dependencies or version conflicts, try installing all the necessary
- packages into a virtual environment (i.e. a project-specific folder rather than globally on your system):
+If `pip install` has issues with dependencies or version conflicts, you can install the necessary
+ packages into a virtual environment (a project-specific folder rather than globally on your system):
 ```bash
 $ sudo pip3 install virtualenv  # pip or pip3, depending on your system
 $ virtualenv -p python3 venv    # create venv folder to store packages
 $ source venv/bin/activate      # activate virtual environment
 $ pip install tbp               # install tbp into venv folder
 ```
-Now, anything you `pip install` will be stored in the `venv` folder, and when
-you invoke `python` or `tbp`, the local versions will be used.
+Now when you invoke `tbp`, the local versions will be used.
 
 #### Building from GitHub clone
-To use the `tbp` Python package from source without installation via `pip install`, libDAI must first be compiled. To do this:
+To use the `tbp` Python package from source without installation via `pip install`, libDAI must first be compiled:
  
 ```bash
 $ git clone git@github.com:akxlr/tbp.git
@@ -106,7 +114,7 @@ $ make
 ...
 libDAI built successfully!
 ```
-This produces a utility `libdai/utils/dfgmarg`, which is symlinked from `tbp/dfgmarg` and used during inference.
+This produces a utility `libdai/utils/dfgmarg` which is symlinked from `tbp/dfgmarg` and used during inference. See [libDAI README](libdai/README) for full installation instructions.
 
 
 ## Using MATLAB for the decomposition
@@ -114,7 +122,7 @@ The decomposition of potential functions uses the non-negative CP decomposition 
 library. As an alternative to TensorLy, the [MATLAB Tensor Toolbox](http://www.sandia.gov/~tgkolda/TensorToolbox) can be used
 (this was what we used in [1]). To use this instead of Tensorly:
 
- * Install MATLAB normally
+ * Install MATLAB
  * Install the
  [MATLAB Python API](https://www.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html)
  * Install the [MATLAB Tensor Toolbox](http://www.sandia.gov/~tgkolda/TensorToolbox)
