@@ -61,7 +61,7 @@ def setup_tbp():
         },
         install_requires=[
             'numpy',
-            'tensorly',
+            'tensorly==0.4.2',
         ],
         # The only part of libDAI actually installed to the user's system is the dfgmarg binary - ensure the
         # binary is included in the installed package dir
